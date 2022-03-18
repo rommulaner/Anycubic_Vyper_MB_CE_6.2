@@ -1,0 +1,1 @@
+AC_TRI_F1_V1 (v0.0.6 motherboard)
