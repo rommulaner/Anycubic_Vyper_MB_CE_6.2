@@ -91,14 +91,15 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
             switch (buttonValue) {
                 case 1:
                     queue.enqueue_one_P("G28 U0");
+                    queue.enqueue_one_P("G0 Z5");
+                    sprintf(Buffer, "G0 X%d Y%d", X_CENTER, Y_CENTER);
+                    queue.enqueue_one_P(Buffer);
                     queue.enqueue_one_P("G0 Z0");
                 break;
 
                 case 2:
-                    // Increase Z-offset
+                    // Increase Z-offset 
                     ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(0.01, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
-                    sprintf(Buffer, "M851 Z%d", VP_Z_OFFSET);
-                    queue.enqueue_one_P(Buffer);
                     ScreenHandler.ForceCompleteUpdate();
                     ScreenHandler.RequestSaveSettings();
                     break;
@@ -106,8 +107,6 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
                 case 3:
                     // Decrease Z-offset
                     ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(-0.01, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
-                    sprintf(Buffer, "M851 Z%d", VP_Z_OFFSET);
-                    queue.enqueue_one_P(Buffer);
                     ScreenHandler.ForceCompleteUpdate();
                     ScreenHandler.RequestSaveSettings();
                     break;

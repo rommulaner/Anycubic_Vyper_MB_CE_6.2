@@ -430,6 +430,10 @@ void GcodeSuite::G28() {
         #endif
 
         TERN(Z_SAFE_HOMING, home_z_safely(), homeaxis(Z_AXIS));
+        float z_offset_backup;
+        z_offset_backup = probe.offset.z;
+        ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(probe.offset.z, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
+        probe.offset.z = z_offset_backup;
         probe.move_z_after_homing();
 
         #if ENABLED(PROBING_HEATERS_OFF)
@@ -454,7 +458,7 @@ void GcodeSuite::G28() {
     #if LINEAR_AXES >= 6
       if (doK) homeaxis(K_AXIS);
     #endif
-
+    
     sync_plan_position();
 
   #endif

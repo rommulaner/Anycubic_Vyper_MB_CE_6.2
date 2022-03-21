@@ -1238,7 +1238,7 @@
  *     |    [-]    |
  *     O-- FRONT --+
  */
-#define NOZZLE_TO_PROBE_OFFSET { 0, 0, 0.2 }
+#define NOZZLE_TO_PROBE_OFFSET { 0, 0, 0 }
 
 // Most probes should stay away from the edges of the bed, but
 // with NOZZLE_AS_PROBE this can be negative for a wider probing area.
@@ -1432,12 +1432,12 @@
 // @section machine
 
 // The size of the printable area
-#define X_BED_SIZE 246
-#define Y_BED_SIZE 255
+#define X_BED_SIZE 250
+#define Y_BED_SIZE 265
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
 #define X_MIN_POS -1.0
-#define Y_MIN_POS -4.2
+#define Y_MIN_POS -6.4
 #define Z_MIN_POS 0
 #define X_MAX_POS X_BED_SIZE
 #define Y_MAX_POS Y_BED_SIZE
@@ -1788,10 +1788,10 @@
 // Manually set the home position. Leave these undefined for automatic settings.
 // For DELTA this is the top-center of the Cartesian print volume.
 #define MANUAL_X_HOME_POS -1.0
-#define MANUAL_Y_HOME_POS -4.2
+#define MANUAL_Y_HOME_POS -6.4
 // Following value is for fixed z stops, adjustable z stops need to be fully out or changed to fixed
 // See thingiverse for replacement fixed insert to fit adjustable stops
-//#define MANUAL_Z_HOME_POS  1.5  
+#define MANUAL_Z_HOME_POS  1.5  
 //#define MANUAL_I_HOME_POS 0
 //#define MANUAL_J_HOME_POS 0
 //#define MANUAL_K_HOME_POS 0
