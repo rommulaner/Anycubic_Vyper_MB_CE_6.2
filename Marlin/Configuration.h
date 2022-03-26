@@ -1433,7 +1433,7 @@
 
 // The size of the printable area
 #define X_BED_SIZE 250
-#define Y_BED_SIZE 265
+#define Y_BED_SIZE 255
 
 // Travel limits (mm) after homing, corresponding to endstop positions.
 #define X_MIN_POS -1.0
@@ -1791,7 +1791,7 @@
 #define MANUAL_Y_HOME_POS -6.4
 // Following value is for fixed z stops, adjustable z stops need to be fully out or changed to fixed
 // See thingiverse for replacement fixed insert to fit adjustable stops
-#define MANUAL_Z_HOME_POS  1.5  
+#define MANUAL_Z_HOME_POS  1.4  
 //#define MANUAL_I_HOME_POS 0
 //#define MANUAL_J_HOME_POS 0
 //#define MANUAL_K_HOME_POS 0
