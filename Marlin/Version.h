@@ -30,7 +30,7 @@
  */
 #ifdef VYPER_NOZZLE_HOMING
     #ifdef VYPER_BUILD
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d+N"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(CJ+N)"
     #elif defined VYPER_BUILD_LA
         #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+N)"
     #elif defined VYPER_BUILD_LA_T
@@ -42,7 +42,7 @@
     #endif
 #else
     #ifdef VYPER_BUILD
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(CJ)"
     #elif defined VYPER_BUILD_LA
         #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA)"
     #elif defined VYPER_BUILD_LA_T
@@ -58,14 +58,14 @@
  * Verbose version identifier which should contain a reference to the location
  * from where the binary was downloaded or the source code was compiled.
  */
-#define DETAILED_BUILD_VERSION "Vyper community firmware - release 6.1d (based on Marlin 2.0.9.1)"
+#define DETAILED_BUILD_VERSION "Vyper Community Firmware - Release 6.1d (based on Marlin 2.0.9.1)"
 
 /**
  * The STRING_DISTRIBUTION_DATE represents when the binary file was built,
  * here we define this default string as the date where the latest release
  * version was tagged.
  */
-#define STRING_DISTRIBUTION_DATE "2022-03-17"
+#define STRING_DISTRIBUTION_DATE "2023-11-05"
 
 
 /**

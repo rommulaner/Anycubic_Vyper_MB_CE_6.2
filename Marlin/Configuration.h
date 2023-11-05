@@ -76,8 +76,8 @@
 // %%%% Options for building Vyper image %%%%
 
 // select build type here
-//#define VYPER_BUILD         // standard
-#define VYPER_BUILD_LA      // with linear advance and junction deviation enabled
+//#define VYPER_BUILD         // standard with Classic Jerk
+#define VYPER_BUILD_LA      // with Linear Advance and Junction Deviation enabled
 //#define VYPER_BUILD_LA_T    // as above but with uart connection to TMC2209's for x, y, z and z2
 //#define VYPER_BUILD_LA_TE   // as above but with software serial connection to e stepper
 
@@ -91,7 +91,7 @@
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "(Paul Matthews, Vyper with TMC motherboard)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "(Rommulaner, Vyper-CE-6.1d)" // Who made the changes.
 #define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
 
 /**

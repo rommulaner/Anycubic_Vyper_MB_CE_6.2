@@ -20,55 +20,30 @@ extern "C" {
   */
 #include "stm32yyxx_hal_conf.h"
 
-#ifdef HAL_PWR_MODULE_ENABLED
-  #undef HAL_PWR_MODULE_ENABLED // only way to disable it
-#endif
-
-#if defined(HAL_PWR_MODULE_ENABLED) && !defined(HAL_PWR_MODULE_ONLY)
-  #define HAL_PWR_MODULE_ONLY // disable low power & PA0 wakeup pin (its T°c pin)
-#endif
-
-#ifndef HAL_IWDG_MODULE_ENABLED
-  #define HAL_IWDG_MODULE_ENABLED // USE_WATCHDOG
-#endif
-
 #ifdef HAL_PCD_MODULE_ENABLED
-  #warning No direct STM32 USB pins on Longer3D board
+  #warning "No direct STM32 USB pins on Longer3D board"
   #undef HAL_PCD_MODULE_ENABLED // USB Device
 #endif
 
 #ifdef HAL_HCD_MODULE_ENABLED
-  #warning No direct STM32 USB pins on Longer3D board
+  #warning "No direct STM32 USB pins on Longer3D board"
   #undef HAL_HCD_MODULE_ENABLED // USB Host
 #endif
 
-#ifndef HAL_USART_MODULE_ENABLED
-  //#define HAL_USART_MODULE_ENABLED // Useless.... UART_MODULE do it
-#endif
+#define HAL_EXTI_MODULE_ENABLED   // Needed for Endstop (and other external) Interrupts
+#define HAL_IWDG_MODULE_ENABLED // USE_WATCHDOG
 
-#ifdef HAL_CAN_LEGACY_MODULE_ENABLED
-  #undef HAL_CAN_LEGACY_MODULE_ENABLED
-#endif
+#undef HAL_PWR_MODULE_ENABLED
+#define HAL_PWR_MODULE_ONLY   // disable low power & PA0 wakeup pin (its T°c pin)
 
-#ifdef HAL_CAN_MODULE_ENABLED
-  #undef HAL_CAN_MODULE_ENABLED
-#endif
-
-#ifdef HAL_DAC_MODULE_ENABLED
-  #undef HAL_DAC_MODULE_ENABLED
-#endif
-
-#ifdef HAL_RTC_MODULE_ENABLED
-  #undef HAL_RTC_MODULE_ENABLED
-#endif
-
-#ifndef HAL_EXTI_MODULE_ENABLED
-  #define HAL_EXTI_MODULE_ENABLED // for ENDSTOP_INTERRUPTS_FEATURE
-#endif
+#undef HAL_CAN_LEGACY_MODULE_ENABLED
+#undef HAL_CAN_MODULE_ENABLED
+#undef HAL_DAC_MODULE_ENABLED
+#undef HAL_RTC_MODULE_ENABLED
 
 /**
-  * @brief List of modules in the framework (first ones enabled by default)
-  */
+ * @brief List of modules in the framework (first ones enabled by default)
+ */
 //#define HAL_MODULE_ENABLED
 //#define HAL_ADC_MODULE_ENABLED
 //#define HAL_CORTEX_MODULE_ENABLED
@@ -86,13 +61,11 @@ extern "C" {
 //#define HAL_SRAM_MODULE_ENABLED
 //#define HAL_TIM_MODULE_ENABLED
 //#define HAL_UART_MODULE_ENABLED
-
 //#define HAL_CAN_MODULE_ENABLED
 //#define HAL_CAN_LEGACY_MODULE_ENABLED
 //#define HAL_CEC_MODULE_ENABLED
 //#define HAL_CRC_MODULE_ENABLED
 //#define HAL_ETH_MODULE_ENABLED
-//#define HAL_EXTI_MODULE_ENABLED
 //#define HAL_HCD_MODULE_ENABLED
 //#define HAL_I2S_MODULE_ENABLED
 //#define HAL_IRDA_MODULE_ENABLED
@@ -101,7 +74,7 @@ extern "C" {
 //#define HAL_NOR_MODULE_ENABLED
 //#define HAL_PCCARD_MODULE_ENABLED
 //#define HAL_SMARTCARD_MODULE_ENABLED
-//#define HAL_USART_MODULE_ENABLED
+//#define HAL_USART_MODULE_ENABLED // Useless.... UART_MODULE does it
 //#define HAL_WWDG_MODULE_ENABLED
 //#define HAL_MMC_MODULE_ENABLED
 
@@ -145,7 +118,7 @@ extern "C" {
 #endif
 
 #ifndef LSE_STARTUP_TIMEOUT
-  #define LSE_STARTUP_TIMEOUT  50U       // No 32.7KHz LSE on this board, reduced to avoid delays
+  #define LSE_STARTUP_TIMEOUT  50U       // No 32.7kHz LSE on this board, reduced to avoid delays
 #endif
 
 /* Tip: To avoid modifying this file each time you need to use different HSE,
@@ -198,7 +171,7 @@ extern "C" {
 * Activated: CRC code is present inside driver
 * Deactivated: CRC code cleaned from driver
 */
-#if !defined(USE_SPI_CRC)
+#ifndef USE_SPI_CRC
 #define USE_SPI_CRC 0
 #endif
 
@@ -345,4 +318,3 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-
