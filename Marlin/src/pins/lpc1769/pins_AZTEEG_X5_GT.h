@@ -23,6 +23,8 @@
 
 /**
  * Azteeg X5 GT pin assignments
+ * Wiring diagram: https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Azteeg%20X5%20GT/X5%20GT%20Wiring%20Diagram.pdf
+ * Origin: https://panucattdevices.freshdesk.com/support/solutions/articles/1000244740-support-files
  */
 
 #include "env_validate.h"
@@ -107,7 +109,7 @@
 // Display
 //
 
-#if ANY(VIKI2, miniVIKI)
+#if EITHER(VIKI2, miniVIKI)
   #define BEEPER_PIN                       P1_31
   #define DOGLCD_A0                        P2_06
   #define DOGLCD_CS                        P0_16

@@ -34,6 +34,7 @@
 #include "FilamentLoadUnloadHandler.h"
 #include "PIDHandler.h"
 #include "MeshValidationHandler.h"
+#include "InputShapingHandler.h"
 
 #include "../../../../module/temperature.h"
 #include "../../../../module/motion.h"
@@ -65,6 +66,7 @@
 #if ENABLED(DGUS_UI_MOVE_DIS_OPTION)
   uint16_t distanceToMove = 10;
 #endif
+
 using namespace ExtUI;
 
 
@@ -288,6 +290,17 @@ const uint16_t VPList_PidTune[] PROGMEM = {
   0x0000
 };
 
+const uint16_t VPList_InputShaping[] PROGMEM = {
+  VPList_CommonWithStatus,
+
+  VP_INPUT_SHAPING_FREQ_X,
+  VP_INPUT_SHAPING_ZETA_X,
+  VP_INPUT_SHAPING_FREQ_Y,
+  VP_INPUT_SHAPING_ZETA_Y,
+
+  0x0000
+};
+
 const uint16_t VPList_FWRetractTune[] PROGMEM = {
   VPList_CommonWithStatus,
 
@@ -305,7 +318,7 @@ const uint16_t VPList_FWRetractTune[] PROGMEM = {
 const uint16_t VPList_LevelingSettings[] PROGMEM = {
   VPList_CommonWithStatus,
 
-  VP_TOGGLE_PROBING_HEATERS_OFF_ONOFF_ICON,
+  VP_TOGGLE_BETTER_ACCURACY_ONOFF_ICON,
   VP_TOGGLE_PROBE_PREHEAT_HOTEND_TEMP,
   VP_TOGGLE_PROBE_PREHEAT_BED_TEMP,
   VP_TOGGLE_POST_PROBING_TEMPERATURE_STABILIZATION_ICON,
@@ -350,11 +363,11 @@ const uint16_t VPList_AdvMovementSettings[] PROGMEM = {
 
   VP_MOV_MINIMUM_SEGMENT_TIME,
   VP_MOV_MINIMUM_FEEDRATE,
-  VP_MOV_NORMAL_ACCELERATION,
-  VP_MOV_RETRACT_ACCELERATION,
+  VP_MOV_DEFAULT_ACCELERATION,
+  VP_MOV_DEFAULT_RETRACT_ACCELERATION,
 
   VP_MOV_MINIMUM_TRAVEL_FEEDRATE,
-  VP_MOV_MINIMUM_TRAVEL_ACCELERATION, 
+  VP_MOV_DEFAULT_TRAVEL_ACCELERATION, 
 
   0x0000
 };
@@ -455,6 +468,7 @@ const struct VPMapping VPMap[] PROGMEM = {
 
   { DGUSLCD_SCREEN_ESTEPS_CALIBRATION, VPList_EstepsCalibration },
   { DGUSLCD_SCREEN_PIDTUNE_CALIBRATION, VPList_PidTune },
+  { DGUSLCD_SCREEN_INPUT_SHAPING, VPList_InputShaping },
 
   { DGUSLCD_SCREEN_TUNEFWRETRACT, VPList_FWRetractTune },
 
@@ -533,8 +547,15 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   VPHELPER(VP_PIDTUNE_START_BUTTON, nullptr, PIDHandler::HandleStartButton, nullptr),
 
   VPHELPER(VP_PIDTUNE_NAV_BUTTON, nullptr, (ScreenHandler.DGUSLCD_NavigateToPage<DGUSLCD_SCREEN_PIDTUNE_CALIBRATION, PIDHandler>), nullptr),
-
   VPHELPER(VP_GENERIC_BACK_BUTTON, nullptr, ScreenHandler.OnBackButton, nullptr),
+
+// ... Input Shaping
+  VPHELPER(VP_INPUT_SHAPING_NAV_BUTTON, nullptr, (ScreenHandler.DGUSLCD_NavigateToPage<DGUSLCD_SCREEN_INPUT_SHAPING, InputShapingHandler>), nullptr),
+  VPHELPER(VP_INPUT_SHAPING_FREQ_X, &InputShapingHandler::set_freq_x, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
+  VPHELPER(VP_INPUT_SHAPING_ZETA_X, &InputShapingHandler::set_zeta_x, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
+  VPHELPER(VP_INPUT_SHAPING_FREQ_Y, &InputShapingHandler::set_freq_y, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
+  VPHELPER(VP_INPUT_SHAPING_ZETA_Y, &InputShapingHandler::set_zeta_y, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
+  VPHELPER(VP_INPUT_SHAPING_BACK_BUTTON, nullptr, InputShapingHandler::HandleInputShapingBackButton, nullptr),
 
 #if HAS_MESH
   // ... Mesh validation
@@ -575,11 +596,11 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   VPHELPER(VP_MOV_MINIMUM_SEGMENT_TIME, &planner.settings.min_segment_time_us, ScreenHandler.DGUSLCD_SetValueDirectly<uint16_t>, ScreenHandler.DGUSLCD_SendWordValueToDisplay),
 
   VPHELPER(VP_MOV_MINIMUM_FEEDRATE, &planner.settings.min_feedrate_mm_s, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
-  VPHELPER(VP_MOV_NORMAL_ACCELERATION, &planner.settings.acceleration, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
-  VPHELPER(VP_MOV_RETRACT_ACCELERATION, &planner.settings.retract_acceleration, ScreenHandler.DGUSLCD_SetFloatAsLongFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<1>),
+  VPHELPER(VP_MOV_DEFAULT_ACCELERATION, &planner.settings.acceleration, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
+  VPHELPER(VP_MOV_DEFAULT_RETRACT_ACCELERATION, &planner.settings.retract_acceleration, ScreenHandler.DGUSLCD_SetFloatAsLongFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsLongValueToDisplay<1>),
 
   VPHELPER(VP_MOV_MINIMUM_TRAVEL_FEEDRATE, &planner.settings.min_travel_feedrate_mm_s, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
-  VPHELPER(VP_MOV_MINIMUM_TRAVEL_ACCELERATION, &planner.settings.travel_acceleration, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
+  VPHELPER(VP_MOV_DEFAULT_TRAVEL_ACCELERATION, &planner.settings.travel_acceleration, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
 
   // Misc settings
   VPHELPER(VP_MISCSETTINGS_NAV_BUTTON, nullptr, (ScreenHandler.DGUSLCD_NavigateToPage<DGUSLCD_SCREEN_MISC_SETTINGS>), nullptr),
@@ -636,12 +657,12 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   VPHELPER_STR(VP_PrintTime, nullptr, VP_PrintTime_LEN, nullptr, ScreenHandler.DGUSLCD_SendPrintTimeToDisplay),
   VPHELPER_STR(VP_PrintTimeWithRemainingVisible, nullptr, VP_PrintTime_LEN, nullptr, ScreenHandler.DGUSLCD_SendPrintTimeWithRemainingToDisplay),
   VPHELPER_STR(VP_PrintTimeRemaining, nullptr, VP_PrintTimeRemaining_LEN, nullptr, ScreenHandler.DGUSLCD_SendPrintTimeRemainingToDisplay),
-  VPHELPER(VP_SCREENCHANGE, nullptr, ScreenHandler.ScreenChangeHook, nullptr),
+  VPHELPER(VP_SCREENCHANGE, nullptr, ScreenHandler.screenChangeHook, nullptr),
   VPHELPER(VP_CONFIRMED, nullptr, ScreenHandler.ScreenConfirmedOK, nullptr),
 
 #if ALL(HAS_PROBE_SETTINGS, HAS_BED_PROBE)
-  VPHELPER(VP_TOGGLE_PROBING_HEATERS_OFF_ONOFF_BUTTON, nullptr, ScreenHandler.HandleToggleProbeHeaters, nullptr),
-  VPHELPER(VP_TOGGLE_PROBING_HEATERS_OFF_ONOFF_ICON, &probe.settings.turn_heaters_off, nullptr, (ScreenHandler.DGUSLCD_SendIconValue<ICON_ACCURACY_TOGGLE_ON, ICON_ACCURACY_TOGGLE_OFF>)),
+  VPHELPER(VP_TOGGLE_BETTER_ACCURACY_ONOFF_BUTTON, nullptr, ScreenHandler.HandleToggleBetterAccuracy, nullptr),
+  VPHELPER(VP_TOGGLE_BETTER_ACCURACY_ONOFF_ICON, &probe.settings.turn_heaters_off, nullptr, (ScreenHandler.DGUSLCD_SendIconValue<ICON_ACCURACY_TOGGLE_ON, ICON_ACCURACY_TOGGLE_OFF>)),
 
   VPHELPER(VP_TOGGLE_POST_PROBING_TEMPERATURE_STABILIZATION_BUTTON, nullptr, ScreenHandler.HandleToggleProbeTemperatureStabilization, nullptr),
   VPHELPER(VP_TOGGLE_POST_PROBING_TEMPERATURE_STABILIZATION_ICON, &probe.settings.stabilize_temperatures_after_probing, nullptr, (ScreenHandler.DGUSLCD_SendIconValue<ICON_POST_PROBE_TEMP_STABILIZATION_TOGGLE_ON, ICON_POST_PROBE_TEMP_STABILIZATION_TOGGLE_OFF>)),
@@ -689,7 +710,7 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
 
   VPHELPER(VP_FWRETRACT_RETRACT_LENGTH, &fwretract.settings.retract_length, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
   VPHELPER(VP_FWRETRACT_RETRACT_FEEDRATE, &fwretract.settings.retract_feedrate_mm_s, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
-  VPHELPER(VP_FWRETRACT_RETRACT_ZHOP, &fwretract.settings.retract_zraise, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
+  VPHELPER(VP_FWRETRACT_RETRACT_ZHOP, &fwretract.settings.retract_zraise, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
 
   VPHELPER(VP_FWRETRACT_RESTART_LENGTH, &fwretract.settings.retract_recover_extra, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
   VPHELPER(VP_FWRETRACT_RESTART_FEEDRATE, &fwretract.settings.retract_recover_feedrate_mm_s, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<1>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<1>),
@@ -725,7 +746,7 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
     VPHELPER(VP_RGB_CONTROL_G, &leds.color.g, ScreenHandler.HandleLED, ScreenHandler.SendLEDToDisplay),
     VPHELPER(VP_RGB_CONTROL_B, &leds.color.b, ScreenHandler.HandleLED, ScreenHandler.SendLEDToDisplay),
 
-    #if EITHER(RGBW_LED, NEOPIXEL_LED)
+    #if ANY(RGBW_LED, NEOPIXEL_LED)
       #if (RGBW_LED || (NEOPIXEL_TYPE == NEO_GRBW))
         VPHELPER(VP_RGB_CONTROL_W, &leds.color.w, ScreenHandler.HandleLED, ScreenHandler.SendLEDToDisplay),
       #endif

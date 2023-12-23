@@ -44,10 +44,10 @@
 #if ENABLED(FLASH_EEPROM_EMULATION)
   // SoC Flash (framework-arduinoststm32-maple/STM32F1/libraries/EEPROM/EEPROM.h)
   #define EEPROM_START_ADDRESS (0x8000000UL + (512 * 1024) - 2 * EEPROM_PAGE_SIZE)
-  #define EEPROM_PAGE_SIZE     (0x800U)           // 2KB, but will use 2x more (4KB)
+  #define EEPROM_PAGE_SIZE     (0x800U)           // 2K, but will use 2x more (4K)
   #define MARLIN_EEPROM_SIZE    EEPROM_PAGE_SIZE
 #else
-  #define MARLIN_EEPROM_SIZE              0x800U  // On SD, Limit to 2KB, require this amount of RAM
+  #define MARLIN_EEPROM_SIZE              0x800U  // On SD, Limit to 2K, require this amount of RAM
 #endif
 
 //
@@ -114,16 +114,16 @@
 #endif
 
 // SPI Flash
-#define HAS_SPI_FLASH                          1
-#if HAS_SPI_FLASH
+#define SPI_FLASH
+#if ENABLED(SPI_FLASH)
   #define SPI_FLASH_SIZE                0x200000  // 2MB
 #endif
 
 // SPI 2
-#define W25QXX_CS_PIN                       PB12
-#define W25QXX_MOSI_PIN                     PB15
-#define W25QXX_MISO_PIN                     PB14
-#define W25QXX_SCK_PIN                      PB13
+#define SPI_FLASH_CS_PIN                    PB12
+#define SPI_FLASH_MOSI_PIN                  PB15
+#define SPI_FLASH_MISO_PIN                  PB14
+#define SPI_FLASH_SCK_PIN                   PB13
 
 //
 // TFT with FSMC interface
@@ -171,7 +171,7 @@
 //
 // SD Card
 //
-#define SDIO_SUPPORT
+#define ONBOARD_SDIO
 #define SD_DETECT_PIN                       -1    // PF0, but it isn't connected
 #define SDIO_CLOCK                       4500000
 #define SDIO_READ_RETRIES                     16

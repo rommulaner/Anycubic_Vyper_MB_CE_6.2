@@ -55,8 +55,7 @@
 #endif
 
 inline void toggle_pins() {
-  const bool ignore_protection = parser.boolval('I'),
-            initial_state = parser.boolval('V');
+  const bool ignore_protection = parser.boolval('I');
   const int repeat = parser.intval('R', 1),
             start = PARSED_PIN_INDEX('S', 0),
             end = PARSED_PIN_INDEX('L', NUM_DIGITAL_PINS - 1),
@@ -66,12 +65,12 @@ inline void toggle_pins() {
     pin_t pin = GET_PIN_MAP_PIN_M43(i);
     if (!VALID_PIN(pin)) continue;
     if (M43_NEVER_TOUCH(i) || (!ignore_protection && pin_is_protected(pin))) {
-      report_pin_state_extended(pin, ignore_protection, true, PSTR("Untouched "));
+      report_pin_state_extended(pin, ignore_protection, true, F("Untouched "));
       SERIAL_EOL();
     }
     else {
-      watchdog_refresh();
-      report_pin_state_extended(pin, ignore_protection, true, PSTR("Pulsing   "));
+      hal.watchdog_refresh();
+      report_pin_state_extended(pin, ignore_protection, true, F("Pulsing   "));
       #ifdef __STM32F1__
         const auto prior_mode = _GET_MODE(i);
       #else
@@ -99,10 +98,10 @@ inline void toggle_pins() {
       {
         pinMode(pin, OUTPUT);
         for (int16_t j = 0; j < repeat; j++) {
-          watchdog_refresh(); extDigitalWrite(pin, initial_state); safe_delay(wait);
-          watchdog_refresh(); extDigitalWrite(pin, !initial_state); safe_delay(wait);
-          watchdog_refresh(); extDigitalWrite(pin, initial_state); safe_delay(wait);
-          watchdog_refresh();
+          hal.watchdog_refresh(); extDigitalWrite(pin, 0); safe_delay(wait);
+          hal.watchdog_refresh(); extDigitalWrite(pin, 1); safe_delay(wait);
+          hal.watchdog_refresh(); extDigitalWrite(pin, 0); safe_delay(wait);
+          hal.watchdog_refresh();
         }
       }
       #ifdef __STM32F1__
@@ -113,7 +112,7 @@ inline void toggle_pins() {
     }
     SERIAL_EOL();
   }
-  SERIAL_ECHOLNPGM("Done.");
+  SERIAL_ECHOLNPGM(STR_DONE);
 
 } // toggle_pins
 
@@ -131,7 +130,7 @@ inline void servo_probe_test() {
 
     const uint8_t probe_index = parser.byteval('P', Z_PROBE_SERVO_NR);
 
-    SERIAL_ECHOLNPAIR("Servo probe test\n"
+    SERIAL_ECHOLNPGM("Servo probe test\n"
                       ". using index:  ", probe_index,
                       ", deploy angle: ", servo_angles[probe_index][0],
                       ", stow angle:   ", servo_angles[probe_index][1]
@@ -144,7 +143,7 @@ inline void servo_probe_test() {
       #define PROBE_TEST_PIN Z_MIN_PIN
       constexpr bool probe_inverting = Z_MIN_ENDSTOP_INVERTING;
 
-      SERIAL_ECHOLNPAIR(". Probe Z_MIN_PIN: ", PROBE_TEST_PIN);
+      SERIAL_ECHOLNPGM(". Probe Z_MIN_PIN: ", PROBE_TEST_PIN);
       SERIAL_ECHOPGM(". Z_MIN_ENDSTOP_INVERTING: ");
 
     #else
@@ -152,7 +151,7 @@ inline void servo_probe_test() {
       #define PROBE_TEST_PIN Z_MIN_PROBE_PIN
       constexpr bool probe_inverting = Z_MIN_PROBE_ENDSTOP_INVERTING;
 
-      SERIAL_ECHOLNPAIR(". Probe Z_MIN_PROBE_PIN: ", PROBE_TEST_PIN);
+      SERIAL_ECHOLNPGM(". Probe Z_MIN_PROBE_PIN: ", PROBE_TEST_PIN);
       SERIAL_ECHOPGM(   ". Z_MIN_PROBE_ENDSTOP_INVERTING: ");
 
     #endif
@@ -199,10 +198,10 @@ inline void servo_probe_test() {
       uint8_t i = 0;
       SERIAL_ECHOLNPGM(". Deploy & stow 4 times");
       do {
-        MOVE_SERVO(probe_index, servo_angles[Z_PROBE_SERVO_NR][0]); // Deploy
+        servo[probe_index].move(servo_angles[Z_PROBE_SERVO_NR][0]); // Deploy
         safe_delay(500);
         deploy_state = READ(PROBE_TEST_PIN);
-        MOVE_SERVO(probe_index, servo_angles[Z_PROBE_SERVO_NR][1]); // Stow
+        servo[probe_index].move(servo_angles[Z_PROBE_SERVO_NR][1]); // Stow
         safe_delay(500);
         stow_state = READ(PROBE_TEST_PIN);
       } while (++i < 4);
@@ -212,11 +211,11 @@ inline void servo_probe_test() {
       if (deploy_state != stow_state) {
         SERIAL_ECHOLNPGM("= Mechanical Switch detected");
         if (deploy_state) {
-          SERIAL_ECHOLNPAIR("  DEPLOYED state: HIGH (logic 1)",
+          SERIAL_ECHOLNPGM("  DEPLOYED state: HIGH (logic 1)",
                             "  STOWED (triggered) state: LOW (logic 0)");
         }
         else {
-          SERIAL_ECHOLNPAIR("  DEPLOYED state: LOW (logic 0)",
+          SERIAL_ECHOLNPGM("  DEPLOYED state: LOW (logic 0)",
                             "  STOWED (triggered) state: HIGH (logic 1)");
         }
         #if ENABLED(BLTOUCH)
@@ -227,7 +226,7 @@ inline void servo_probe_test() {
     }
 
     // Ask the user for a trigger event and measure the pulse width.
-    MOVE_SERVO(probe_index, servo_angles[Z_PROBE_SERVO_NR][0]); // Deploy
+    servo[probe_index].move(servo_angles[Z_PROBE_SERVO_NR][0]); // Deploy
     safe_delay(500);
     SERIAL_ECHOLNPGM("** Please trigger probe within 30 sec **");
     uint16_t probe_counter = 0;
@@ -245,7 +244,7 @@ inline void servo_probe_test() {
         if (probe_counter == 15)
           SERIAL_ECHOLNPGM(": 30ms or more");
         else
-          SERIAL_ECHOLNPAIR(" (+/- 4ms): ", probe_counter * 2);
+          SERIAL_ECHOLNPGM(" (+/- 4ms): ", probe_counter * 2);
 
         if (probe_counter >= 4) {
           if (probe_counter == 15) {
@@ -257,7 +256,7 @@ inline void servo_probe_test() {
         }
         else SERIAL_ECHOLNPGM("FAIL: Noise detected - please re-run test");
 
-        MOVE_SERVO(probe_index, servo_angles[Z_PROBE_SERVO_NR][1]); // Stow
+        servo[probe_index].move(servo_angles[Z_PROBE_SERVO_NR][1]); // Stow
         return;
       }
     }
@@ -304,7 +303,7 @@ void GcodeSuite::M43() {
   if (parser.seen('E')) {
     endstops.monitor_flag = parser.value_bool();
     SERIAL_ECHOPGM("endstop monitor ");
-    SERIAL_ECHOPGM_P(endstops.monitor_flag ? PSTR("en") : PSTR("dis"));
+    SERIAL_ECHOF(endstops.monitor_flag ? F("en") : F("dis"));
     SERIAL_ECHOLNPGM("abled");
     return;
   }
@@ -314,44 +313,74 @@ void GcodeSuite::M43() {
 
   // 'P' Get the range of pins to test or watch
   uint8_t first_pin = PARSED_PIN_INDEX('P', 0),
-          last_pin = parser.seenval('P') ? first_pin : NUMBER_PINS_TOTAL - 1;
+          last_pin = parser.seenval('L') ? PARSED_PIN_INDEX('L', 0) : (parser.seenval('P') ? first_pin : (NUMBER_PINS_TOTAL) - 1);
 
-  if (first_pin > last_pin) return;
+  NOMORE(first_pin, (NUMBER_PINS_TOTAL) - 1);
+  NOMORE(last_pin, (NUMBER_PINS_TOTAL) - 1);
+
+  if (first_pin > last_pin) {
+    const uint8_t f = first_pin;
+    first_pin = last_pin;
+    last_pin = f;
+  }
 
   // 'I' to ignore protected pins
   const bool ignore_protection = parser.boolval('I');
 
   // 'W' Watch until click, M108, or reset
   if (parser.boolval('W')) {
-    SERIAL_ECHOLNPGM("Watching pins");
     #ifdef ARDUINO_ARCH_SAM
       NOLESS(first_pin, 2); // Don't hijack the UART pins
     #endif
-    uint8_t pin_state[last_pin - first_pin + 1];
+
+    const uint8_t pin_count = last_pin - first_pin + 1;
+    uint8_t pin_state[pin_count];
+    bool can_watch = false;
     LOOP_S_LE_N(i, first_pin, last_pin) {
       pin_t pin = GET_PIN_MAP_PIN_M43(i);
       if (!VALID_PIN(pin)) continue;
       if (M43_NEVER_TOUCH(i) || (!ignore_protection && pin_is_protected(pin))) continue;
+      can_watch = true;
       pinMode(pin, INPUT_PULLUP);
       delay(1);
-        /*
-        if (IS_ANALOG(pin))
-          pin_state[pin - first_pin] = analogRead(DIGITAL_PIN_TO_ANALOG_PIN(pin)); // int16_t pin_state[...]
-        else
-        //*/
-          pin_state[i - first_pin] = extDigitalRead(pin);
+      /*
+      if (IS_ANALOG(pin))
+        pin_state[pin - first_pin] = analogRead(DIGITAL_PIN_TO_ANALOG_PIN(pin)); // int16_t pin_state[...]
+      else
+      //*/
+        pin_state[i - first_pin] = extDigitalRead(pin);
     }
+
+    const bool multipin = (pin_count > 1);
+
+    if (!can_watch) {
+      SERIAL_ECHOPGM("Specified pin");
+      SERIAL_ECHOPGM_P(multipin ? PSTR("s are") : PSTR(" is"));
+      SERIAL_ECHOLNPGM(" protected. Use 'I' to override.");
+      return;
+    }
+
+    // "Watching pin(s) # - #"
+    SERIAL_ECHOPGM("Watching pin");
+    if (multipin) SERIAL_CHAR('s');
+    SERIAL_CHAR(' '); SERIAL_ECHO(first_pin);
+    if (multipin) SERIAL_ECHOPGM(" - ", last_pin);
+    SERIAL_EOL();
 
     #if HAS_RESUME_CONTINUE
       KEEPALIVE_STATE(PAUSED_FOR_USER);
       wait_for_user = true;
-      TERN_(HOST_PROMPT_SUPPORT, host_prompt_do(PROMPT_USER_CONTINUE, PSTR("M43 Wait Called"), CONTINUE_STR));
-      TERN_(EXTENSIBLE_UI, ExtUI::onUserConfirmRequired_P(PSTR("M43 Wait Called")));
+      TERN_(HOST_PROMPT_SUPPORT, hostui.continue_prompt(F("M43 Waiting...")));
+      #if ENABLED(EXTENSIBLE_UI)
+        ExtUI::onUserConfirmRequired(F("M43 Waiting..."));
+      #else
+        LCD_MESSAGE(MSG_USERWAIT);
+      #endif
     #endif
 
     for (;;) {
       LOOP_S_LE_N(i, first_pin, last_pin) {
-        pin_t pin = GET_PIN_MAP_PIN_M43(i);
+        const pin_t pin = GET_PIN_MAP_PIN_M43(i);
         if (!VALID_PIN(pin)) continue;
         if (M43_NEVER_TOUCH(i) || (!ignore_protection && pin_is_protected(pin))) continue;
         const byte val =
@@ -362,7 +391,7 @@ void GcodeSuite::M43() {
           //*/
             extDigitalRead(pin);
         if (val != pin_state[i - first_pin]) {
-          report_pin_state_extended(pin, ignore_protection, false);
+          report_pin_state_extended(pin, ignore_protection, true);
           pin_state[i - first_pin] = val;
         }
       }
@@ -374,11 +403,13 @@ void GcodeSuite::M43() {
 
       safe_delay(200);
     }
+
+    TERN_(HAS_RESUME_CONTINUE, ui.reset_status());
   }
   else {
     // Report current state of selected pin(s)
     LOOP_S_LE_N(i, first_pin, last_pin) {
-      pin_t pin = GET_PIN_MAP_PIN_M43(i);
+      const pin_t pin = GET_PIN_MAP_PIN_M43(i);
       if (VALID_PIN(pin)) report_pin_state_extended(pin, ignore_protection, true);
     }
   }

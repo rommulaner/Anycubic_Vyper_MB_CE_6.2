@@ -23,10 +23,13 @@
 
 /**
  * Dreammaker Overlord v1.1 pin assignments
+ * Schematic: https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Dreammaker%20Overlord%20v1.1/Schematic.pdf
+ * Origin: https://github.com/jdpiercy/Overlord-Pro/blob/master/Motherboard/Schematic.pdf
+ * ATmega2560
  */
 
 #if HOTENDS > 2 || E_STEPPERS > 2
-  #error "Overlord Controller supports up to 2 hotends / E-steppers. Comment out this line to continue."
+  #error "Overlord supports up to 2 hotends / E steppers."
 #endif
 
 #include "env_validate.h"
@@ -49,7 +52,7 @@
   #define Z_MIN_PROBE_PIN                     46  // JP4, Tfeed1
 #endif
 
-#if ENABLED(FILAMENT_RUNOUT_SENSOR)
+#ifndef FIL_RUNOUT_PIN
   #define FIL_RUNOUT_PIN                      44  // JP3, Tfeed2
 #endif
 
@@ -119,7 +122,7 @@
 //
 // LCD / Controller
 //
-#if HAS_MARLINUI_U8GLIB
+#if HAS_WIRED_LCD
   // OVERLORD OLED pins
   #define LCD_PINS_RS                         20
   #define LCD_PINS_D5                         21
@@ -135,7 +138,7 @@
 #if IS_NEWPANEL
   #define BTN_ENC                             16  // Enter Pin
   #define BTN_UP                              19  // Button UP Pin
-  #define BTN_DWN                             17  // Button DOWN Pin
+  #define BTN_DOWN                            17  // Button DOWN Pin
 #endif
 
 // Additional connectors/pins on the Overlord V1.X board

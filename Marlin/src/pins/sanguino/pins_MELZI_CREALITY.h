@@ -23,6 +23,9 @@
 
 /**
  * Melzi (Creality) pin assignments
+ * Schematic: https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Melzi%20(Creality)/CR-10%20Schematic.pdf
+ * Origin: https://github.com/Creality3DPrinting/CR10-Melzi-1.1.2/blob/master/Circuit%20diagram/Motherboard/CR-10%20Schematic.pdf
+ * ATmega1284P
  *
  * The Creality board needs a bootloader installed before Marlin can be uploaded.
  * If you don't have a chip programmer you can use a spare Arduino plus a few
@@ -36,36 +39,38 @@
 #define BOARD_INFO_NAME "Melzi (Creality)"
 
 // Alter timing for graphical display
-#if HAS_MARLINUI_U8GLIB
-  #ifndef BOARD_ST7920_DELAY_1
-    #define BOARD_ST7920_DELAY_1 DELAY_NS(125)
-  #endif
-  #ifndef BOARD_ST7920_DELAY_2
-    #define BOARD_ST7920_DELAY_2 DELAY_NS(125)
-  #endif
-  #ifndef BOARD_ST7920_DELAY_3
-    #define BOARD_ST7920_DELAY_3 DELAY_NS(125)
-  #endif
+#if IS_U8GLIB_ST7920
+  #define BOARD_ST7920_DELAY_1               125
+  #define BOARD_ST7920_DELAY_2               125
+  #define BOARD_ST7920_DELAY_3               125
 #endif
 
-#include "pins_MELZI.h"
-
 //
-// For the stock CR-10 enable CR10_STOCKDISPLAY in Configuration.h
+// LCD / Controller
 //
-#undef LCD_SDSS
-#undef LED_PIN
-#undef LCD_PINS_RS
-#undef LCD_PINS_ENABLE
-#undef LCD_PINS_D4
-#undef LCD_PINS_D5
-#undef LCD_PINS_D6
-#undef LCD_PINS_D7
+#if ANY(MKS_MINI_12864, CR10_STOCKDISPLAY, ENDER2_STOCKDISPLAY)
+  #if EITHER(CR10_STOCKDISPLAY, ENDER2_STOCKDISPLAY)
+    #define LCD_PINS_RS                       28  // ST9720 CS
+    #define LCD_PINS_ENABLE                   17  // ST9720 DAT
+    #define LCD_PINS_D4                       30  // ST9720 CLK
+  #endif
+  #if EITHER(MKS_MINI_12864, ENDER2_STOCKDISPLAY)
+    #define DOGLCD_CS                         28
+    #define DOGLCD_A0                         30
+  #endif
 
-#define LCD_SDSS                              31  // Smart Controller SD card reader (rather than the Melzi)
-#define LCD_PINS_RS                           28  // ST9720 CS
-#define LCD_PINS_ENABLE                       17  // ST9720 DAT
-#define LCD_PINS_D4                           30  // ST9720 CLK
+  #define LCD_SDSS                            31  // Controller's SD card
+
+  #define BTN_ENC                             16
+  #define BTN_EN1                             11
+  #define BTN_EN2                             10
+  #define BEEPER_PIN                          27
+
+  #define LCD_PINS_DEFINED
+
+#endif
+
+#include "pins_MELZI.h" // ... SANGUINOLOLU_12 ... SANGUINOLOLU_11
 
 #if ENABLED(BLTOUCH)
   #ifndef SERVO0_PIN
@@ -74,7 +79,7 @@
   #if SERVO0_PIN == BEEPER_PIN
     #undef BEEPER_PIN
   #endif
-#elif ENABLED(FILAMENT_RUNOUT_SENSOR)
+#elif HAS_FILAMENT_SENSOR
   #ifndef FIL_RUNOUT_PIN
     #define FIL_RUNOUT_PIN                    27
   #endif
@@ -137,11 +142,11 @@
 
 /**
  *    EXP1 Connector                      EXP1 as CR10 STOCKDISPLAY
- *        _____                                      _____
- *   PA4 | 6 5 | PC0                     BEEPER_PIN | 6 5 | BTN_ENC
- *   PD3 | 7 4 | RESET                      BTN_EN1 | 7 4 | RESET
- *   PD2   8 3 | PA1                        BTN_EN2   8 3 | LCD_PINS_D4 (ST9720 CLK)
- *   PA3 | 9 2 | PC1        (ST9720 CS) LCD_PINS_RS | 9 2 | LCD_PINS_ENABLE (ST9720 DAT)
- *   GND |10 1 | 5V                             GND |10 1 | 5V
- *        -----                                   -----
+ *        ------                                      ------
+ *   PA4 | 1  2 | PC0                     BEEPER_PIN | 1  2 | BTN_ENC
+ *   PD3 | 3  4 | RESET                      BTN_EN1 | 3  4 | RESET
+ *   PD2   5  6 | PA1                        BTN_EN2   5  6 | LCD_PINS_D4     (ST9720 CLK)
+ *   PA3 | 7  8 | PC1        (ST9720 CS) LCD_PINS_RS | 7  8 | LCD_PINS_ENABLE (ST9720 DAT)
+ *   GND | 9 10 | 5V                             GND | 9 10 | 5V
+ *        ------                                      ------
  */

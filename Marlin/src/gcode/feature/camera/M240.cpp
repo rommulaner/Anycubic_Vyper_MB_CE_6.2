@@ -128,28 +128,21 @@ void GcodeSuite::M240() {
 
     if (homing_needed_error()) return;
 
-    const xyz_pos_t old_pos = {
+    const xyz_pos_t old_pos = NUM_AXIS_ARRAY(
       current_position.x + parser.linearval('A'),
       current_position.y + parser.linearval('B'),
-      current_position.z
-    };
+      current_position.z,
+      current_position.i, current_position.j, current_position.k,
+      current_position.u, current_position.v, current_position.w
+    );
 
     #ifdef PHOTO_RETRACT_MM
-      const float rval = parser.seenval('R') ? parser.value_linear_units() : _PHOTO_RETRACT_MM;
-      feedRate_t sval = (
-        #if ENABLED(ADVANCED_PAUSE_FEATURE)
-          PAUSE_PARK_RETRACT_FEEDRATE
-        #elif ENABLED(FWRETRACT)
-          RETRACT_FEEDRATE
-        #else
-          45
-        #endif
-      );
-      if (parser.seenval('S')) sval = parser.value_feedrate();
+      const float rval = parser.linearval('R', _PHOTO_RETRACT_MM);
+      const feedRate_t sval = parser.feedrateval('S', TERN(ADVANCED_PAUSE_FEATURE, PAUSE_PARK_RETRACT_FEEDRATE, TERN(FWRETRACT, RETRACT_FEEDRATE, 45)));
       e_move_m240(-rval, sval);
     #endif
 
-    feedRate_t fr_mm_s = MMM_TO_MMS(parser.linearval('F'));
+    feedRate_t fr_mm_s = parser.feedrateval('F');
     if (fr_mm_s) NOLESS(fr_mm_s, 10.0f);
 
     constexpr xyz_pos_t photo_position = PHOTO_POSITION;

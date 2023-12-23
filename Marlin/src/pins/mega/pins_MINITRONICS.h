@@ -23,6 +23,11 @@
 
 /**
  * Minitronics v1.0/1.1 pin assignments
+ * Schematic (1.0): https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Minitronics%20v1.0/minitronics%20-%20Project.pdf
+ * Origin (1.0): https://reprap.org/wiki/File:MinitronicsPDF.zip
+ * Datasheet (1.1): https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Minitronics%20v1.1/datasheet%20minitronics%20v1.1.pdf
+ * Origin (1.1): https://reprapworld.nl/documentation/datasheet%20minitronics%20v1.1.pdf
+ * ATmega1281
  */
 
 /**
@@ -34,7 +39,7 @@
 #if NOT_TARGET(__AVR_ATmega1281__)
   #error "Oops! Select 'Minitronics' in 'Tools > Board.'"
 #elif HOTENDS > 2 || E_STEPPERS > 2
-  #error "Minitronics supports up to 2 hotends / E-steppers. Comment out this line to continue."
+  #error "Minitronics supports up to 2 hotends / E steppers."
 #endif
 
 #define BOARD_INFO_NAME "Minitronics v1.0/1.1"

@@ -72,7 +72,7 @@ if pioutil.is_pio_build():
         result = check_envs("env:"+build_env, board_envs, config)
 
         if not result:
-            err = "Error: Build environment '%s' is incompatible with %s. Use one of these environments: %s" % \
+            err = "Error: Build environment '%s' is incompatible with %s. Use one of these: %s" % \
                   ( build_env, motherboard, ", ".join([ e[4:] for e in board_envs if e.startswith("env:") ]) )
             raise SystemExit(err)
 
@@ -117,12 +117,12 @@ if pioutil.is_pio_build():
             if (p / f).is_file():
                 mixedin += [ f ]
         p = Path(env['PROJECT_DIR'], "Marlin/src/feature/bedlevel/abl")
-        #for f in [ "abl.cpp", "abl.h" ]:
-        #    if (p / f).is_file():
-        #        mixedin += [ f ]
-        #if mixedin:
-        #    err = "ERROR: Old files fell into your Marlin folder. Remove %s and try again" % ", ".join(mixedin)
-        #    raise SystemExit(err)
+        for f in [ "abl.cpp", "abl.h" ]:
+            if (p / f).is_file():
+                mixedin += [ f ]
+        if mixedin:
+            err = "ERROR: Old files fell into your Marlin folder. Remove %s and try again" % ", ".join(mixedin)
+            raise SystemExit(err)
 
         #
         # Check FILAMENT_RUNOUT_SCRIPT has a %c parammeter when required

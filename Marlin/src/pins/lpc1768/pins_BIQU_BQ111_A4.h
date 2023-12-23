@@ -22,7 +22,7 @@
 #pragma once
 
 /**
- * BIQU BQ111-A4
+ * BIQU BQ111-A4 pin assignments
  *
  * Applies to the following boards:
  *

@@ -27,6 +27,10 @@
 #include "../../../inc/MarlinConfig.h"
 #include "SPIFlashStorage.h"
 
+#if DISABLED(SPI_FLASH)
+  #error "SPI_FLASH is required with TFT_LVGL_UI."
+#endif
+
 extern W25QXXFlash W25QXX;
 
 uint8_t SPIFlashStorage::m_pageData[SPI_FLASH_PageSize];
@@ -43,9 +47,9 @@ uint32_t SPIFlashStorage::m_startAddress;
   static uint32_t rle_compress(T *output, uint32_t outputLength, T *input, uint32_t inputLength, uint32_t& inputProcessed) {
     uint32_t count = 0, out = 0, index, i;
     T pixel;
-    //32767 for uint16_t
-    //127 for uint16_t
-    //calculated at compile time
+    // 32767 for uint16_t
+    // 127 for uint16_t
+    // calculated at compile time
     constexpr T max = (0xFFFFFFFF >> (8 * (4 - sizeof(T)))) / 2;
 
     inputProcessed = 0;
@@ -144,7 +148,7 @@ uint32_t SPIFlashStorage::m_startAddress;
 
 #endif // HAS_SPI_FLASH_COMPRESSION
 
-void SPIFlashStorage::beginWrite(uint32_t startAddress) {
+void SPIFlashStorage::beginWrite(const uint32_t startAddress) {
   m_pageDataUsed = 0;
   m_currentPage = 0;
   m_startAddress = startAddress;
@@ -167,7 +171,7 @@ void SPIFlashStorage::endWrite() {
   #endif
 }
 
-void SPIFlashStorage::savePage(uint8_t *buffer) {
+void SPIFlashStorage::savePage(uint8_t * const buffer) {
   W25QXX.SPI_FLASH_BufferWrite(buffer, m_startAddress + (SPI_FLASH_PageSize * m_currentPage), SPI_FLASH_PageSize);
   // Test env
   // char fname[256];
@@ -177,7 +181,7 @@ void SPIFlashStorage::savePage(uint8_t *buffer) {
   // fclose(fp);
 }
 
-void SPIFlashStorage::loadPage(uint8_t *buffer) {
+void SPIFlashStorage::loadPage(uint8_t * const buffer) {
   W25QXX.SPI_FLASH_BufferRead(buffer, m_startAddress + (SPI_FLASH_PageSize * m_currentPage), SPI_FLASH_PageSize);
   // Test env
   // char fname[256];
@@ -256,7 +260,7 @@ void SPIFlashStorage::readPage() {
   #endif
 }
 
-uint16_t SPIFlashStorage::inData(uint8_t *data, uint16_t size) {
+uint16_t SPIFlashStorage::inData(const uint8_t * const data, uint16_t size) {
   // Don't write more than we can
   NOMORE(size, pageDataFree());
   memcpy(m_pageData + m_pageDataUsed, data, size);
@@ -264,12 +268,12 @@ uint16_t SPIFlashStorage::inData(uint8_t *data, uint16_t size) {
   return size;
 }
 
-void SPIFlashStorage::writeData(uint8_t *data, uint16_t size) {
+void SPIFlashStorage::writeData(const uint8_t *data, uint16_t size) {
   // Flush a page if needed
   if (pageDataFree() == 0) flushPage();
 
   while (size > 0) {
-    uint16_t written = inData(data, size);
+    const uint16_t written = inData(data, size);
     size -= written;
     // Need to write more? Flush page and continue!
     if (size > 0) {
@@ -279,7 +283,7 @@ void SPIFlashStorage::writeData(uint8_t *data, uint16_t size) {
   }
 }
 
-void SPIFlashStorage::beginRead(uint32_t startAddress) {
+void SPIFlashStorage::beginRead(const uint32_t startAddress) {
   m_startAddress = startAddress;
   m_currentPage = 0;
   // Nothing in memory now
@@ -289,7 +293,7 @@ void SPIFlashStorage::beginRead(uint32_t startAddress) {
   #endif
 }
 
-uint16_t SPIFlashStorage::outData(uint8_t *data, uint16_t size) {
+uint16_t SPIFlashStorage::outData(uint8_t * const data, uint16_t size) {
   // Don't read more than we have
   NOMORE(size, pageDataFree());
   memcpy(data, m_pageData + m_pageDataUsed, size);
@@ -302,7 +306,7 @@ void SPIFlashStorage::readData(uint8_t *data, uint16_t size) {
   if (pageDataFree() == 0) readPage();
 
   while (size > 0) {
-    uint16_t read = outData(data, size);
+    const uint16_t read = outData(data, size);
     size -= read;
     // Need to write more? Flush page and continue!
     if (size > 0) {

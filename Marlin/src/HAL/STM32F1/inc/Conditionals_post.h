@@ -30,5 +30,5 @@
 
 // Allow SDSUPPORT to be disabled
 #if DISABLED(SDSUPPORT)
-  #undef SDIO_SUPPORT
+  #undef ONBOARD_SDIO
 #endif

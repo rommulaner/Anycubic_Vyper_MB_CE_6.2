@@ -10,7 +10,7 @@
 
 #include "../../ui_api.h"
 #include "../../../marlinui.h"
-
+#include "../../../../libs/buzzer.h"
 #include "../../../../module/temperature.h"
 #include "../../../../module/settings.h"
 #include "../../../../module/planner.h"
@@ -106,7 +106,7 @@ void FilamentLoadUnloadHandler::ChangeFilamentWithTemperature(PGM_P command) {
     }
     
     // Handle commands
-    SERIAL_ECHOLNPAIR("Injecting command: ", cmd);
+    SERIAL_ECHOLNPGM("Injecting command: ", cmd);
     GcodeSuite::process_subcommands_now(cmd);
     SERIAL_ECHOPGM_P("- done");
 

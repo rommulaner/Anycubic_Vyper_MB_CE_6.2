@@ -63,7 +63,7 @@ enum DGUSLCD_Screens : uint8_t {
 
   DGUSLCD_SCREEN_POWER_LOSS = 54,       // DWINTouchPage::DIALOG_POWER_FAILURE
   DGUSLCD_SCREEN_THERMAL_RUNAWAY = 57,  // DWINTouchPage::ERR_THERMAL_RUNAWAY
-  DGUSLCD_SCREEN_HEATING_FAILED = 58,   // DWINTouchPage::ERR_HEATING_FAILED
+  DGUSLCD_SCREEN_HEATING_FAILED = 58,   // DWINTouchPage::HEATING_FAILED_LCD
   DGUSLCD_SCREEN_THERMISTOR_ERROR = 59, // DWINTouchPage::ERR_THERMISTOR
 
   DGUSLCD_SCREEN_AUTOHOME = 61,         // DWINTouchPage::AUTOHOME_IN_PROGRESS
@@ -71,6 +71,7 @@ enum DGUSLCD_Screens : uint8_t {
   DGUSLCD_SCREEN_POPUP = 63,           // NEW - does not exist in original display
   DGUSLCD_SCREEN_KILL = 64,            // NEW - does not exist in original display
 
+  DGUSLCD_SCREEN_INPUT_SHAPING = 82,
   DGUSLCD_SCREEN_PIDTUNE_CALIBRATION = 68,
   DGUSLCD_SCREEN_ESTEPS_CALIBRATION = 69,
 
@@ -93,7 +94,7 @@ enum DGUSLCD_Screens : uint8_t {
 
 // Version checks
 constexpr uint16_t VP_UI_VERSION_MAJOR = 0xFFFA;
-constexpr uint16_t EXPECTED_UI_VERSION_MAJOR = 61;
+constexpr uint16_t EXPECTED_UI_VERSION_MAJOR = 62;
 constexpr uint16_t VERSION_MISMATCH_BUZZ_AMOUNT = 5;
 constexpr uint16_t VERSION_MISMATCH_LED_FLASH_DELAY = 1000;
 
@@ -258,7 +259,7 @@ constexpr uint16_t VP_Z_OFFSET = 0x1026;
 // // SDCard File Listing
 constexpr uint16_t VP_SD_ScrollEvent = 0x20D4; // Data: 0 for "up a directory", numbers are the amount to scroll, e.g -1 one up, 1 one down
 constexpr uint16_t VP_SD_FileSelected = 0x2200; // Number of file field selected.
-constexpr uint16_t VP_SD_FileName_LEN = 21; // LEN is shared for all entries.
+constexpr uint16_t VP_SD_FileName_LEN = 31; // LEN is shared for all entries.
 constexpr uint16_t VP_SD_FileName_CNT = 5; // LEN is shared for all entries.
 constexpr uint16_t DGUS_SD_FILESPERSCREEN = VP_SD_FileName_CNT; // FIXME move that info to the display and read it from there.
 constexpr uint16_t VP_SD_FileName0 = 0x20D5;
@@ -326,7 +327,7 @@ constexpr uint16_t ICON_AXIS_SETTINGS_TITLE_E = 23;
 constexpr uint16_t VP_AXIS_SETTINGS_NAV_BACKBUTTON = 0x22DD;
 
 constexpr uint16_t VP_AXIS_SETTINGS_AXIS_STEPSMM = 0x22DF; // 2-byte
-constexpr uint16_t VP_AXIS_SETTINGS_AXIS_MAX_ACCEL = 0x22E1; // 4-byte (!)
+constexpr uint16_t VP_AXIS_SETTINGS_AXIS_MAX_ACCEL = 0x22E1; // 2-byte
 constexpr uint16_t VP_AXIS_SETTINGS_AXIS_JERK = 0x22E5; // 2-byte
 constexpr uint16_t VP_AXIS_SETTINGS_AXIS_FEEDRATE = 0x22E7; // 2-byte
 
@@ -347,13 +348,13 @@ constexpr uint16_t AXIS_TMC_NAV_ICON_HIDING = 11;
 constexpr uint16_t VP_MOV_NAV_BUTTON = 0x2305; 
 
 constexpr uint16_t VP_MOV_MINIMUM_SEGMENT_TIME = 0x22F9; // uint 2-byte
-constexpr uint16_t VP_MOV_MINIMUM_FEEDRATE = 0x22FB; // float 2-byte
-constexpr uint16_t VP_MOV_NORMAL_ACCELERATION = 0x22FD; // float 2-byte
+constexpr uint16_t VP_MOV_MINIMUM_FEEDRATE = 0x22FB; // uint 2-byte
+constexpr uint16_t VP_MOV_DEFAULT_ACCELERATION = 0x22FD; // uint 2-byte
 
-constexpr uint16_t VP_MOV_MINIMUM_TRAVEL_FEEDRATE = 0x2301; // float 2-byte
-constexpr uint16_t VP_MOV_MINIMUM_TRAVEL_ACCELERATION = 0x2303; // float 2-byte
+constexpr uint16_t VP_MOV_MINIMUM_TRAVEL_FEEDRATE = 0x2301; // uint 2-byte
+constexpr uint16_t VP_MOV_DEFAULT_TRAVEL_ACCELERATION = 0x2303; // uint 2-byte
 
-constexpr uint16_t VP_MOV_RETRACT_ACCELERATION = 0x2307; // float 4-byte
+constexpr uint16_t VP_MOV_DEFAULT_RETRACT_ACCELERATION = 0x2307; // uint 4-byte(!)
 
 // Misc settings
 constexpr uint16_t VP_MISCSETTINGS_NAV_BUTTON = 0x2311; 
@@ -446,7 +447,6 @@ constexpr uint16_t VP_BUTTON_MOVEKEY = 0x1046;
 constexpr uint16_t VP_ESTEP_NAV_BUTTON = 0x2291;
 constexpr uint16_t VP_PIDTUNE_NAV_BUTTON = 0x2293;
 constexpr uint16_t VP_GENERIC_BACK_BUTTON = 0x2295; // Generic button for popping back to the old display
-
 constexpr uint16_t GENERIC_BACK_BUTTON_NEED_SAVE = 0x1;
 
 // PID tuning
@@ -455,6 +455,14 @@ constexpr uint16_t VP_PIDTUNE_CYCLES = 0x2299;
 constexpr uint16_t VP_PIDTUNE_FAN_TOGGLE = 0x238C;
 constexpr uint16_t VP_PIDTUNE_FAN_TOGGLE_ICON = 0x238E;
 constexpr uint16_t VP_PIDTUNE_START_BUTTON = 0x229B;
+
+// Input Shaping
+constexpr uint16_t VP_INPUT_SHAPING_FREQ_X = 0x2323;
+constexpr uint16_t VP_INPUT_SHAPING_ZETA_X = 0x2327;
+constexpr uint16_t VP_INPUT_SHAPING_FREQ_Y = 0x2329;
+constexpr uint16_t VP_INPUT_SHAPING_ZETA_Y = 0x232D;
+constexpr uint16_t VP_INPUT_SHAPING_BACK_BUTTON = 0x232F;
+constexpr uint16_t VP_INPUT_SHAPING_NAV_BUTTON = 0x2331;
 
 // FWRetract
 constexpr uint16_t VP_FWRETRACT_NAV_BUTTON = 0x22AD;
@@ -476,8 +484,8 @@ constexpr uint16_t VP_LINEAR_ADVANCE_FACTOR = 0x22AF;
 constexpr uint16_t VP_OTHER_TUNE_NAV_BUTTON = 0x2382;
 
 // Leveling settings
-constexpr uint16_t VP_TOGGLE_PROBING_HEATERS_OFF_ONOFF_BUTTON = 0x22C1;
-constexpr uint16_t VP_TOGGLE_PROBING_HEATERS_OFF_ONOFF_ICON = 0x22C3;
+constexpr uint16_t VP_TOGGLE_BETTER_ACCURACY_ONOFF_BUTTON = 0x22C1;
+constexpr uint16_t VP_TOGGLE_BETTER_ACCURACY_ONOFF_ICON = 0x22C3;
 
 constexpr uint16_t VP_TOGGLE_PROBE_PREHEAT_HOTEND_TEMP = 0x22C5;
 constexpr uint16_t VP_TOGGLE_PROBE_PREHEAT_BED_TEMP = 0x22C7;
@@ -558,6 +566,7 @@ constexpr uint16_t ICON_FWRETRACT_AUTO_ENGAGED = 3;
 
 // Development helper
 constexpr uint16_t VP_DEVELOPMENT_HELPER_BUTTON = 0x22D5;
+constexpr uint16_t VP_DEVELOPMENT_HELPER_BUTTON_ACTION_SCREEN_BOOT = 1;
 constexpr uint16_t VP_DEVELOPMENT_HELPER_BUTTON_ACTION_FIRMWARE_UPDATE = 2;
 constexpr uint16_t VP_DEVELOPMENT_HELPER_BUTTON_ACTION_TO_MAIN_MENU = 4;
 constexpr uint16_t VP_DEVELOPMENT_HELPER_BUTTON_ACTION_RESET_DISPLAY = 8;

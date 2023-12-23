@@ -47,9 +47,9 @@
 #if ENABLED(IIC_BL24CXX_EEPROM)
   #define IIC_EEPROM_SDA                    PA11
   #define IIC_EEPROM_SCL                    PA12
-  #define MARLIN_EEPROM_SIZE               0x800  // 2Kb (24C16)
+  #define MARLIN_EEPROM_SIZE               0x800  // 2K (24C16)
 #elif ENABLED(SDCARD_EEPROM_EMULATION)
-  #define MARLIN_EEPROM_SIZE               0x800  // 2Kb
+  #define MARLIN_EEPROM_SIZE               0x800  // 2K
 #endif
 
 //
@@ -64,7 +64,9 @@
 //
 // Probe
 //
-#define PROBE_TARE_PIN                      PA5
+#ifndef PROBE_TARE_PIN
+  #define PROBE_TARE_PIN                    PA5
+#endif
 
 //
 // Steppers
@@ -95,7 +97,7 @@
 // Heaters / Fans
 //
 
-#define FAN_SOFT_PWM
+#define FAN_SOFT_PWM_REQUIRED
 
 //
 // SD Card
@@ -103,16 +105,10 @@
 #define SD_DETECT_PIN                       PC7
 #define NO_SD_HOST_DRIVE                          // SD is only seen by the printer
 
-#define SDIO_SUPPORT                              // Extra added by Creality
-#define SDIO_CLOCK                       4500000  // In original source code overridden by Creality in sdio.h
-
-#ifndef SDIO_READ_RETRIES
-#define SDIO_READ_RETRIES                  16
-#endif
+#define ONBOARD_SDIO                              // Extra added by Creality
+#define SDIO_CLOCK                       6000000  // In original source code overridden by Creality in sdio.h
 
 //
 // Misc. Functions
 //
-#define LED_PIN                             PA6
-#define CASE_LIGHT_PIN                      LED_PIN
-
+#define CASE_LIGHT_PIN                      PA6

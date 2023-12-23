@@ -83,9 +83,9 @@ public:
   static void setstatusmessagePGM(PGM_P const msg);
 
   // Callback for VP "Display wants to change screen on idle printer"
-  static void ScreenChangeHookIfIdle(DGUS_VP_Variable &var, void *val_ptr);
+  static void screenChangeHookIfIdle(DGUS_VP_Variable &var, void *val_ptr);
   // Callback for VP "Screen has been changed"
-  static void ScreenChangeHook(DGUS_VP_Variable &var, void *val_ptr);
+  static void screenChangeHook(DGUS_VP_Variable &var, void *val_ptr);
   // Callback for VP "All Heaters Off"
   static void HandleAllHeatersOff(DGUS_VP_Variable &var, void *val_ptr);
   // Hook for "Change this temperature"
@@ -122,7 +122,7 @@ public:
   static void HandleTouchScreenStandbyTimeSetting(DGUS_VP_Variable &var, void *val_ptr);
 
   #if HAS_PROBE_SETTINGS
-  static void HandleToggleProbeHeaters(DGUS_VP_Variable &var, void *val_ptr);
+  static void HandleToggleBetterAccuracy(DGUS_VP_Variable &var, void *val_ptr);
   static void HandleToggleProbeTemperatureStabilization(DGUS_VP_Variable &var, void *val_ptr);
   static void HandleToggleProbePreheatTemp(DGUS_VP_Variable &var, void *val_ptr);
   #endif
@@ -134,7 +134,7 @@ public:
     static void HandlePIDAutotune(DGUS_VP_Variable &var, void *val_ptr);
   #endif
 
-  #if EITHER(HAS_BED_PROBE, BABYSTEPPING)
+  #if ALL(HAS_BED_PROBE, BABYSTEPPING)
     // Hook for "Change probe offset z"
     template<int decimals>
     static void HandleZoffsetChange(DGUS_VP_Variable &var, void *val_ptr) {
@@ -181,7 +181,7 @@ public:
 
   #if ENABLED(SDSUPPORT)
     // Callback for VP "Display wants to change screen when there is a SD card"
-    static void ScreenChangeHookIfSD(DGUS_VP_Variable &var, void *val_ptr);
+    static void screenChangeHookIfSD(DGUS_VP_Variable &var, void *val_ptr);
     /// Scroll buttons on the file listing screen.
     static void DGUSLCD_SD_ScrollFilelist(DGUS_VP_Variable &var, void *val_ptr);
     /// File touched.
@@ -208,13 +208,13 @@ public:
 
   static void OnFactoryReset();
 
-#if HAS_BUZZER
+#if HAS_BEEPER
   static void Buzzer(const uint16_t frequency, const uint16_t duration);
 #endif
 
   static void OnHomingStart();
-  static void OnHomingComplete();
-  static void OnPrintFinished();
+  static void OnHomingDone();
+  static void OnPrintDone();
 
   // OK Button the Confirm screen.
   static void ScreenConfirmedOK(DGUS_VP_Variable &var, void *val_ptr);
@@ -270,7 +270,7 @@ public:
     if (!var.memadr) return;
     union { unsigned char tmp[sizeof(T)]; T t; } x;
     unsigned char *ptr = (unsigned char*)val_ptr;
-    LOOP_L_N(i, sizeof(T)) x.tmp[i] = ptr[sizeof(T) - i - 1];
+    for (uint8_t i = 0; i < sizeof(T); ++i) x.tmp[i] = ptr[sizeof(T) - i - 1];
     *(T*)var.memadr = x.t;
   }
 
@@ -343,7 +343,7 @@ public:
   // Toggle a boolean at the specified memory address
   static void DGUSLCD_ToggleBoolean(DGUS_VP_Variable &var, void *val_ptr) {
     if (var.memadr) {
-      SERIAL_ECHOLNPAIR("Toggle boolean - ", var.VP);
+      SERIAL_ECHOLNPGM("Toggle boolean - ", var.VP);
 
       bool* val = (bool *)var.memadr;
       *val = !*val;

@@ -23,10 +23,11 @@
 
 /**
  * FELIXprinters v2.0/3.0 (RAMPS v1.4) pin assignments
+ * ATmega2560, ATmega1280
  */
 
 #if HOTENDS > 2 || E_STEPPERS > 2
-  #error "Felix 2.0+ supports up to 2 hotends / E-steppers. Comment out this line to continue."
+  #error "Felix 2.0+ supports up to 2 hotends / E steppers."
 #endif
 
 #define BOARD_INFO_NAME "Felix 2.0+"
@@ -49,7 +50,7 @@
 //
 // LCD / Controller
 //
-#if IS_ULTRA_LCD && IS_NEWPANEL
+#if HAS_WIRED_LCD && IS_NEWPANEL
 
   #define SD_DETECT_PIN                       6
 

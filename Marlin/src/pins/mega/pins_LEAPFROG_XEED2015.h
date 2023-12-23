@@ -23,6 +23,7 @@
 
 /**
  * Leapfrog Xeed Driver board pin assignments
+ * ATmega2560
  *
  * This board is used by other Leapfrog printers in addition to the Xeed,
  * such as the Creatr HS and Bolt. The pin assignments vary wildly between
@@ -84,7 +85,7 @@
 #define E1_ENABLE_PIN                         33
 
 //
-// Filament runout
+// Filament Runout Sensor
 //
 #define FIL_RUNOUT_PIN                        42  // ROT2 Connector
 #define FIL_RUNOUT2_PIN                       44  // ROT1 Connector

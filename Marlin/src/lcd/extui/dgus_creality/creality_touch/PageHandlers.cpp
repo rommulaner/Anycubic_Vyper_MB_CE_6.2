@@ -61,13 +61,11 @@ void SetupMenuHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
                     break;
 
                 case 7: // Reset to factory settings
+                    ScreenHandler.GotoScreen(DGUSLCD_SCREEN_MAIN, false);
                     settings.reset();
                     settings.save();
-
                     ExtUI::injectCommands_P(PSTR("M300"));
-
-                    ScreenHandler.GotoScreen(DGUSLCD_SCREEN_MAIN, false);
-                    ScreenHandler.setstatusmessagePGM(PSTR("Restored default settings. Please turn your printer off and then on to complete the reset"));
+                    ScreenHandler.setstatusmessagePGM(PSTR("Default settings restored"));
                     break;
             }
             break;
@@ -90,28 +88,33 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
         case VP_BUTTON_BEDLEVELKEY:
             switch (buttonValue) {
                 case 1:
-                    queue.enqueue_one_P("G28 U0");
-                    queue.enqueue_one_P("G0 Z5");
-                    sprintf(Buffer, "G0 X%d Y%d", X_CENTER, Y_CENTER);
-                    queue.enqueue_one_P(Buffer);
-                    queue.enqueue_one_P("G0 Z0");
+                    queue.enqueue_now_P("G28 U0");                      //home all axis
+                    queue.enqueue_now_P("G0 Z5");                       //raise z
+                    sprintf(Buffer, "G0 X%d Y%d F4800", X_CENTER, Y_CENTER);  
+                    queue.enqueue_now_P(Buffer);                        //move nozzle to mid of bed in x an y
+                    queue.enqueue_now_P("G1 Z0 F120");                  //lower nozzle to bed for adjusting z-offset
                 break;
 
                 case 2:
-                    // Increase Z-offset 
-                    ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(0.01, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
-                    ScreenHandler.ForceCompleteUpdate();
-                    ScreenHandler.RequestSaveSettings();
+                    if (all_axes_trusted()) {
+                        // Increase Z-offset 
+                        ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(0.01, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
+                        queue.enqueue_now_P("M500");
+                        ScreenHandler.ForceCompleteUpdate();
+                        ScreenHandler.RequestSaveSettings();
+                    }
                     break;
-
+                    
                 case 3:
-                    // Decrease Z-offset
-                    ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(-0.01, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
-                    ScreenHandler.ForceCompleteUpdate();
-                    ScreenHandler.RequestSaveSettings();
+                    if (all_axes_trusted()) {
+                        // Decrease Z-offset
+                        ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(-0.01, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
+                        queue.enqueue_now_P("M500");
+                        ScreenHandler.ForceCompleteUpdate();
+                        ScreenHandler.RequestSaveSettings();
+                    }    
                     break;
             }
-
             break;
 
         case VP_BUTTON_PREPAREENTERKEY:
@@ -139,7 +142,8 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
             #if ENABLED(Z_STEPPER_AUTO_ALIGN) && DISABLED(Z_MULTI_ENDSTOPS)
                 ExtUI::injectCommands_P("G28 U0\nG34\nG29 U0");
             #else
-                ExtUI::injectCommands_P("G28 U0\nG29 U0");
+                probe.offset.z = 0;                                  //zero Z-offset
+                ExtUI::injectCommands_P("G28 U0\nG29 U0");  //home all axis, start bed leveling
             #endif
 #if HAS_MESH
             ScreenHandler.ResetMeshValues();
@@ -156,7 +160,7 @@ void LevelingHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
             if (!ScreenHandler.HasCurrentSynchronousOperation()) {
                 ScreenHandler.PopToOldScreen();
             } else {
-                ScreenHandler.setstatusmessagePGM("Wait for leveling completion...");
+                ScreenHandler.setstatusmessagePGM(PSTR("Wait for leveling completion..."));
             }
 
             break;
@@ -175,7 +179,7 @@ void TempMenuHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
             break;
 
         case VP_BUTTON_TEMPCONTROL:
-            switch (buttonValue){ 
+            switch (buttonValue) { 
                 case 3:
                     ScreenHandler.GotoScreen(DGUSLCD_SCREEN_TEMP_PLA);
                     break;
@@ -216,7 +220,6 @@ void PrepareMenuHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
                 case 5:
                     thermalManager.setTargetHotend(ui.material_preset[0].hotend_temp, 0);
                     thermalManager.setTargetBed(ui.material_preset[0].bed_temp);
-
                     break;
 
                 case 6:
@@ -378,21 +381,21 @@ void MoveHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
             ScreenHandler.GotoScreen(DGUSLCD_SCREEN_MOVE01MM, false);
             break;
         case 4:
-            // Temporary copy probe settings so we home without preheating, then restore settings afterward
-#if ALL(HAS_BED_PROBE, HAS_PROBE_SETTINGS)
-            auto prev_probe_settings = probe.settings;
-
-            probe.settings.preheat_bed_temp = 0;
-            probe.settings.preheat_hotend_temp = 0;
-            probe.settings.stabilize_temperatures_after_probing = false;
-#endif
+            // Temporary copy probe settings so we home without preheating, then restore setings afterward
+            #if ALL(HAS_BED_PROBE, HAS_PROBE_SETTINGS)
+                auto prev_probe_settings = probe.settings;
+                probe.settings.preheat_bed_temp = 0;
+                probe.settings.preheat_hotend_temp = 0;
+                probe.settings.stabilize_temperatures_after_probing = false;
+            #endif
+            
             ExtUI::injectCommands_P("G28");
-#if ALL(HAS_BED_PROBE, HAS_PROBE_SETTINGS)
-            while (queue.has_commands_queued()) queue.advance();
-
-            // ... Restore settings
-            probe.settings = prev_probe_settings;
-#endif
+            
+            #if ALL(HAS_BED_PROBE, HAS_PROBE_SETTINGS)
+                while (queue.has_commands_queued()) queue.advance();
+                // ... Restore settings
+                probe.settings = prev_probe_settings;
+            #endif
             break;
         }
     }
@@ -443,8 +446,8 @@ void DGUSCrealityDisplay_HandleReturnKeyEvent(DGUS_VP_Variable &var, void *val_p
     if ((map->ScreenID) == current_screen) {
         uint16_t button_value = uInt16Value(val_ptr);
         
-        SERIAL_ECHOPAIR("Invoking handler for screen ", current_screen);
-        SERIAL_ECHOLNPAIR("with VP=", var.VP, " value=", button_value);
+        SERIAL_ECHOPGM("Invoking handler for screen ", current_screen);
+        SERIAL_ECHOLNPGM("with VP=", var.VP, " value=", button_value);
 
         map->Handler(var, button_value);
         return;

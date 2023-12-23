@@ -250,9 +250,9 @@ void DGUSDisplay::ProcessRx() {
           const uint16_t vp = tmp[0] << 8 | tmp[1];
 
           //const uint8_t dlen = tmp[2] << 1;  // Convert to Bytes. (Display works with words)
-          //DEBUG_ECHOPAIR(" vp=", vp, " dlen=", dlen);
+          //DEBUG_ECHOPGM(" vp=", vp, " dlen=", dlen);
           DGUS_VP_Variable ramcopy;
-          DEBUG_ECHOLNPAIR("VP received: ", vp , " - val ", tmp[3]);
+          DEBUG_ECHOLNPGM("VP received: ", vp , " - val ", tmp[3]);
           if (populate_VPVar(vp, &ramcopy)) {
             if (ramcopy.set_by_display_handler)
               ramcopy.set_by_display_handler(ramcopy, &tmp[3]);
@@ -260,7 +260,7 @@ void DGUSDisplay::ProcessRx() {
               DEBUG_ECHOLNPGM(" VPVar found, no handler.");
           }
           else
-            DEBUG_ECHOLNPAIR(" VPVar not found:", vp);
+            DEBUG_ECHOLNPGM(" VPVar not found:", vp);
 
           rx_datagram_state = DGUS_IDLE;
           break;
@@ -299,7 +299,7 @@ void DGUSDisplay::loop() {
 void DGUSDisplay::RequestScreen(DGUSLCD_Screens screen) {
   displayRequest = screen;
 
-  DEBUG_ECHOLNPAIR("GotoScreen ", screen);
+  DEBUG_ECHOLNPGM("GotoScreen ", screen);
   const unsigned char gotoscreen[] = { 0x5A, 0x01, (unsigned char) (screen >> 8U), (unsigned char) (screen & 0xFFU) };
   WriteVariable(0x84, gotoscreen, sizeof(gotoscreen));
 }
@@ -315,8 +315,8 @@ void DGUSDisplay::SetTouchScreenConfiguration(bool enable_standby, bool enable_s
   //cfg_bits |= 1UL << 0; // 90 degrees, creality
   cfg_bits |= ((unsigned long) DGUS_LCD_UI_CREALITY_TOUCH_ORIENTATION) & 3; // bit 1 & 0: orientation of display
 
-  DEBUG_ECHOLNPAIR("Update touch screen config - standby ", enable_standby);
-  DEBUG_ECHOLNPAIR("Update touch screen config - sound ", enable_sound);
+  DEBUG_ECHOLNPGM("Update touch screen config - standby ", enable_standby);
+  DEBUG_ECHOLNPGM("Update touch screen config - sound ", enable_sound);
 
   const unsigned char config_set[] = { 0x5A, 0x00, (unsigned char) (cfg_bits >> 8U), (unsigned char) (cfg_bits & 0xFFU) };
   WriteVariable(0x80 /*System_Config*/, config_set, sizeof(config_set));
@@ -342,9 +342,9 @@ DGUSLCD_Screens DGUSDisplay::displayRequest = DGUSLCD_SCREEN_BOOT;
 #define sw_barrier() asm volatile("": : :"memory");
 
 bool populate_VPVar(const uint16_t VP, DGUS_VP_Variable * const ramcopy) {
-  //DEBUG_ECHOLNPAIR("populate_VPVar ", VP);
+  //DEBUG_ECHOLNPGM("populate_VPVar ", VP);
   const DGUS_VP_Variable *pvp = DGUSLCD_FindVPVar(VP);
-  // DEBUG_ECHOLNPAIR(" pvp ", (uint16_t )pvp);
+  // DEBUG_ECHOLNPGM(" pvp ", (uint16_t )pvp);
   if (!pvp) return false;
   memcpy_P(ramcopy, pvp, sizeof(DGUS_VP_Variable));
   return true;

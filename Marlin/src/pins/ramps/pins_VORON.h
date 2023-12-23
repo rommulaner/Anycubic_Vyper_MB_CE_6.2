@@ -24,11 +24,12 @@
 /**
  * VORON Design v2 pin assignments
  * See https://github.com/mzbotreprap/VORON/blob/master/Firmware/Marlin/pins_RAMPS_VORON.h
+ * ATmega2560
  */
 
 #define BOARD_INFO_NAME "VORON Design v2"
 
-#define RAMPS_D8_PIN                          11
+#define MOSFET_C_PIN                          11
 
 #include "pins_RAMPS.h"
 

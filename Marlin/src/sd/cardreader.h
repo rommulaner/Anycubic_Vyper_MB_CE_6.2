@@ -27,8 +27,13 @@
 
 extern const char M23_STR[], M24_STR[];
 
-#if BOTH(SDCARD_SORT_ALPHA, SDSORT_DYNAMIC_RAM)
-  #define SD_RESORT 1
+#if ENABLED(SDCARD_SORT_ALPHA)
+  #if ENABLED(SDSORT_DYNAMIC_RAM)
+    #define SD_RESORT 1
+  #endif
+  #if FOLDER_SORTING || ENABLED(SDSORT_GCODE)
+    #define HAS_FOLDER_SORTING 1
+  #endif
 #endif
 
 #if ENABLED(SDCARD_RATHERRECENTFIRST) && DISABLED(SDCARD_SORT_ALPHA)
@@ -75,11 +80,16 @@ typedef struct {
        filenameIsDir:1,
        workDirIsRoot:1,
        abort_sd_printing:1
+       #if DO_LIST_BIN_FILES
+         , filenameIsBin:1
+       #endif
        #if ENABLED(BINARY_FILE_TRANSFER)
          , binary_mode:1
        #endif
     ;
 } card_flags_t;
+
+enum ListingFlags : uint8_t { LS_LONG_FILENAME, LS_ONLY_BIN, LS_TIMESTAMP };
 
 #if ENABLED(AUTO_REPORT_SD_STATUS)
   #include "../libs/autoreport.h"
@@ -106,11 +116,11 @@ public:
 
   static void changeMedia(DiskIODriver *_driver) { driver = _driver; }
 
-  static SdFile getroot() { return root; }
+  static MediaFile getroot() { return root; }
 
   static void mount();
   static void release();
-  static inline bool isMounted() { return flag.mounted; }
+  static bool isMounted() { return flag.mounted; }
 
   // Handle media insert/remove
   static void manage_media();
@@ -123,7 +133,7 @@ public:
     static uint8_t autofile_index;  // Next auto#.g index to run, plus one. Ignored by autofile_check when zero.
     static void autofile_begin();   // Begin check. Called automatically after boot-up.
     static bool autofile_check();   // Check for the next auto-start file and run it.
-    static inline void autofile_cancel() { autofile_index = 0; }
+    static void autofile_cancel() { autofile_index = 0; }
   #endif
 
   // Basic file ops
@@ -133,7 +143,7 @@ public:
   static bool fileExists(const char * const name);
   static void removeFile(const char * const name);
 
-  static inline char* longest_filename() { return longFilename[0] ? longFilename : filename; }
+  static char* longest_filename() { return longFilename[0] ? longFilename : filename; }
   #if ENABLED(LONG_FILENAME_HOST_SUPPORT)
     static void printLongPath(char * const path);   // Used by M33
   #endif
@@ -158,18 +168,18 @@ public:
   static void endFilePrintNow(TERN_(SD_RESORT, const bool re_sort=false));
   static void abortFilePrintNow(TERN_(SD_RESORT, const bool re_sort=false));
   static void fileHasFinished();
-  static inline void abortFilePrintSoon() { flag.abort_sd_printing = true; }
-  static inline void pauseSDPrint()       { flag.sdprinting = false; }
-  static inline bool isPrinting()         { return flag.sdprinting; }
-  static inline bool isPaused()           { return isFileOpen() && !isPrinting(); }
+  static void abortFilePrintSoon() { flag.abort_sd_printing = isFileOpen(); }
+  static void pauseSDPrint()       { flag.sdprinting = false; }
+  static bool isPrinting()         { return flag.sdprinting; }
+  static bool isPaused()           { return isFileOpen() && !isPrinting(); }
   #if HAS_PRINT_PROGRESS_PERMYRIAD
-    static inline uint16_t permyriadDone() {
+    static uint16_t permyriadDone() {
       if (flag.sdprintdone) return 10000;
       if (isFileOpen() && filesize) return sdpos / ((filesize + 9999) / 10000);
       return 0;
     }
   #endif
-  static inline uint8_t percentDone() {
+  static uint8_t percentDone() {
     if (flag.sdprintdone) return 100;
     if (isFileOpen() && filesize) return sdpos / ((filesize + 99) / 100);
     return 0;
@@ -180,12 +190,12 @@ public:
    * Relative paths apply to the workDir.
    *
    * update_cwd: Pass 'true' to update the workDir on success.
-   *   inDirPtr: On exit your pointer points to the target SdFile.
+   *   inDirPtr: On exit your pointer points to the target MediaFile.
    *             A nullptr indicates failure.
    *       path: Start with '/' for abs path. End with '/' to get a folder ref.
    *       echo: Set 'true' to print the path throughout the loop.
    */
-  static const char* diveToFile(const bool update_cwd, SdFile* &inDirPtr, const char * const path, const bool echo=false);
+  static const char* diveToFile(const bool update_cwd, MediaFile* &inDirPtr, const char * const path, const bool echo=false);
 
   #if ENABLED(SDCARD_SORT_ALPHA)
     static void presort();
@@ -199,7 +209,7 @@ public:
     FORCE_INLINE static void getfilename_sorted(const uint16_t nr) { selectFileByIndex(nr); }
   #endif
 
-  static void ls(TERN_(LONG_FILENAME_HOST_SUPPORT, bool includeLongNames=false));
+  static void ls(const uint8_t lsflags);
 
   #if ENABLED(POWER_LOSS_RECOVERY)
     static bool jobRecoverFileExists();
@@ -207,21 +217,25 @@ public:
     static void removeJobRecoveryFile();
   #endif
 
+  // Binary flag for the current file
+  static bool fileIsBinary() { return TERN0(DO_LIST_BIN_FILES, flag.filenameIsBin); }
+  static void setBinFlag(const bool bin) { TERN(DO_LIST_BIN_FILES, flag.filenameIsBin = bin, UNUSED(bin)); }
+
   // Current Working Dir - Set by cd, cdup, cdroot, and diveToFile(true, ...)
-  static inline char* getWorkDirName()  { workDir.getDosName(filename); return filename; }
-  static inline SdFile& getWorkDir()    { return workDir.isOpen() ? workDir : root; }
+  static char* getWorkDirName()  { workDir.getDosName(filename); return filename; }
+  static MediaFile& getWorkDir()    { return workDir.isOpen() ? workDir : root; }
 
   // Print File stats
-  static inline uint32_t getFileSize()  { return filesize; }
-  static inline uint32_t getIndex()     { return sdpos; }
-  static inline bool isFileOpen()       { return isMounted() && file.isOpen(); }
-  static inline bool eof()              { return getIndex() >= getFileSize(); }
+  static uint32_t getFileSize()  { return filesize; }
+  static uint32_t getIndex()     { return sdpos; }
+  static bool isFileOpen()       { return isMounted() && file.isOpen(); }
+  static bool eof()              { return getIndex() >= getFileSize(); }
 
   // File data operations
-  static inline int16_t get()                            { int16_t out = (int16_t)file.read(); sdpos = file.curPosition(); return out; }
-  static inline int16_t read(void *buf, uint16_t nbyte)  { return file.isOpen() ? file.read(buf, nbyte) : -1; }
-  static inline int16_t write(void *buf, uint16_t nbyte) { return file.isOpen() ? file.write(buf, nbyte) : -1; }
-  static inline void setIndex(const uint32_t index)      { file.seekSet((sdpos = index)); }
+  static int16_t get()                            { int16_t out = (int16_t)file.read(); sdpos = file.curPosition(); return out; }
+  static int16_t read(void *buf, uint16_t nbyte)  { return file.isOpen() ? file.read(buf, nbyte) : -1; }
+  static int16_t write(void *buf, uint16_t nbyte) { return file.isOpen() ? file.write(buf, nbyte) : -1; }
+  static void setIndex(const uint32_t index)      { file.seekSet((sdpos = index)); }
 
   // TODO: rename to diskIODriver()
   static DiskIODriver* diskIODriver() { return driver; }
@@ -248,7 +262,7 @@ private:
   //
   // Working directory and parents
   //
-  static SdFile root, workDir, workDirParents[MAX_DIR_DEPTH];
+  static MediaFile root, workDir, workDirParents[MAX_DIR_DEPTH];
   static uint8_t workDirDepth;
 
   //
@@ -308,8 +322,8 @@ private:
   #endif // SDCARD_SORT_ALPHA
 
   static DiskIODriver *driver;
-  static SdVolume volume;
-  static SdFile file;
+  static MarlinVolume volume;
+  static MediaFile file;
 
   static uint32_t filesize, // Total size of the current file, in bytes
                   sdpos;    // Index most recently read (one behind file.getPos)
@@ -326,14 +340,12 @@ private:
   //
   // Directory items
   //
-  static bool is_dir_or_gcode(const dir_t &p);
-  static int countItems(SdFile dir);
-  static void selectByIndex(SdFile dir, const uint8_t index);
-  static void selectByName(SdFile dir, const char * const match);
+  static bool is_visible_entity(const dir_t &p OPTARG(CUSTOM_FIRMWARE_UPLOAD, const bool onlyBin=false));
+  static int countItems(MediaFile dir);
+  static void selectByIndex(MediaFile dir, const uint8_t index);
+  static void selectByName(MediaFile dir, const char * const match);
   static void printListing(
-    SdFile parent
-    OPTARG(LONG_FILENAME_HOST_SUPPORT, const bool includeLongNames=false)
-    , const char * const prepend=nullptr
+    MediaFile parent, const char * const prepend, const uint8_t lsflags
     OPTARG(LONG_FILENAME_HOST_SUPPORT, const char * const prependLong=nullptr)
   );
 
@@ -344,7 +356,7 @@ private:
 
 #if ENABLED(USB_FLASH_DRIVE_SUPPORT)
   #define IS_SD_INSERTED() DiskIODriver_USBFlash::isInserted()
-#elif PIN_EXISTS(SD_DETECT)
+#elif HAS_SD_DETECT
   #define IS_SD_INSERTED() (READ(SD_DETECT_PIN) == SD_DETECT_STATE)
 #else
   // No card detect line? Assume the card is inserted.

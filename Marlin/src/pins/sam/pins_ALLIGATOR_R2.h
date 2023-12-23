@@ -85,6 +85,13 @@
 #define Z_MS1_PIN                             44  // PC19
 #define E0_MS1_PIN                            45  // PC18
 
+#ifndef MICROSTEP16
+  #define MICROSTEP16 LOW,LOW,LOW
+#endif
+#ifndef MICROSTEP32
+  #define MICROSTEP32 HIGH,HIGH,LOW
+#endif
+
 //#define MOTOR_FAULT_PIN                     22  // PB26 , motor X-Y-Z-E0 motor FAULT
 
 //
@@ -123,20 +130,20 @@
 
 #define SPI_CHAN_DAC                           1
 
-#define DAC0_SYNC                             53  // PB14
-#define DAC1_SYNC                              6  // PC24
+#define DAC0_SYNC_PIN                         53  // PB14
+#define DAC1_SYNC_PIN                          6  // PC24
 
 // 64K SPI EEPROM
 #define SPI_EEPROM
 #define SPI_CHAN_EEPROM1                       2
-#define SPI_EEPROM1_CS                        25  // PD0
+#define SPI_EEPROM1_CS_PIN                    25  // PD0
 
 // 2K SPI EEPROM
-#define SPI_EEPROM2_CS                        26  // PD1
+#define SPI_EEPROM2_CS_PIN                    26  // PD1
 
 // FLASH SPI
 // 32Mb
-#define SPI_FLASH_CS                          23  // PA14
+#define SPI_FLASH_CS_PIN                      23  // PA14
 
 //
 // LCD / Controller

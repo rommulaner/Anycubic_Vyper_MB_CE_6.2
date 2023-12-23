@@ -486,7 +486,7 @@ void MarlinSerial<Cfg>::write(const uint8_t c) {
     const uint8_t i = (tx_buffer.head + 1) & (Cfg::TX_SIZE - 1);
 
     // If global interrupts are disabled (as the result of being called from an ISR)...
-    if (!ISRS_ENABLED()) {
+    if (!hal.isr_state()) {
 
       // Make room by polling if it is possible to transmit, and do so!
       while (i == tx_buffer.tail) {
@@ -534,7 +534,7 @@ void MarlinSerial<Cfg>::flushTX() {
     if (!_written) return;
 
     // If global interrupts are disabled (as the result of being called from an ISR)...
-    if (!ISRS_ENABLED()) {
+    if (!hal.isr_state()) {
 
       // Wait until everything was transmitted - We must do polling, as interrupts are disabled
       while (tx_buffer.head != tx_buffer.tail || !B_TXC) {
@@ -629,7 +629,7 @@ MSerialT1 customizedSerial1(MSerialT1::HasEmergencyParser);
   template class MarlinSerial< LCDSerialCfg<LCD_SERIAL_PORT> >;
   MSerialLCD lcdSerial(MSerialLCD::HasEmergencyParser);
 
-  #if HAS_DGUS_LCD || ENABLED(DGUS_LCD_UI_CREALITY_TOUCH)
+  #if HAS_DGUS_LCD
     template<typename Cfg>
     typename MarlinSerial<Cfg>::ring_buffer_pos_t MarlinSerial<Cfg>::get_tx_buffer_free() {
       const ring_buffer_pos_t t = tx_buffer.tail,  // next byte to send.

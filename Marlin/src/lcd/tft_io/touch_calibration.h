@@ -2,6 +2,9 @@
  * Marlin 3D Printer Firmware
  * Copyright (c) 2020 MarlinFirmware [https://github.com/MarlinFirmware/Marlin]
  *
+ * Based on Sprinter and grbl.
+ * Copyright (c) 2011 Camiel Gubbels / Erik van der Zalm
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -54,6 +57,7 @@ class TouchCalibration {
 public:
   static calibrationState calibration_state;
   static touch_calibration_point_t calibration_points[4];
+  static millis_t next_touch_update_ms;
 
   static bool validate_precision(int32_t a, int32_t b) { return (a > b ? (100 * b) / a :  (100 * a) / b) > TOUCH_SCREEN_CALIBRATION_PRECISION; }
   static bool validate_precision_x(uint8_t a, uint8_t b) { return validate_precision(calibration_points[a].raw_x, calibration_points[b].raw_x); }
@@ -61,11 +65,12 @@ public:
   static void validate_calibration();
 
   static touch_calibration_t calibration;
-  static uint8_t             failed_count;
+  static uint8_t failed_count;
   static void calibration_reset() { calibration = { TOUCH_CALIBRATION_X, TOUCH_CALIBRATION_Y, TOUCH_OFFSET_X, TOUCH_OFFSET_Y, TOUCH_ORIENTATION }; }
   static bool need_calibration() { return !calibration.offset_x && !calibration.offset_y && !calibration.x && !calibration.y; }
 
   static calibrationState calibration_start() {
+    next_touch_update_ms = millis() + 750UL;
     calibration = { 0, 0, 0, 0, TOUCH_ORIENTATION_NONE };
     calibration_state = CALIBRATION_TOP_LEFT;
     calibration_points[CALIBRATION_TOP_LEFT].x = 30;
@@ -86,7 +91,7 @@ public:
     return !need_calibration();
   }
 
-  static bool handleTouch(uint16_t x, uint16_t y);
+  static bool handleTouch(const uint16_t x, const uint16_t y);
 };
 
 extern TouchCalibration touch_calibration;

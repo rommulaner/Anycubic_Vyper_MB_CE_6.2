@@ -11,7 +11,7 @@
 
 #include "../../ui_api.h"
 #include "../../../marlinui.h"
-
+#include "../../../../libs/buzzer.h"
 #include "../../../../module/temperature.h"
 #include "../../../../module/settings.h"
 #include "../../../../module/planner.h"
@@ -74,7 +74,7 @@ void PIDHandler::HandleStartButton(DGUS_VP_Variable &var, void *val_ptr) {
 
     char cmd[64]; // Add a G4 to allow the fan speed to take effect
     sprintf_P(cmd, PSTR("M106 S%d\nG4 S2\nM303 S%d C%d E%d U1"), fan_speed, calibration_temperature, cycles, target);
-    SERIAL_ECHOLNPAIR("Executing: ", cmd);
+    SERIAL_ECHOLNPGM("Executing: ", cmd);
 
     ExtUI::injectCommands(cmd);
     while (queue.has_commands_queued()) queue.advance();

@@ -24,8 +24,9 @@
 
 #include "../gcode.h"
 
-#include "../../module/stepper.h"
 #include "../../module/endstops.h"
+#include "../../module/planner.h"
+#include "../../module/stepper.h" // for various
 
 #if HAS_MULTI_HOTEND
   #include "../../module/tool_change.h"
@@ -33,6 +34,10 @@
 
 #if HAS_LEVELING
   #include "../../feature/bedlevel/bedlevel.h"
+#endif
+
+#if ENABLED(BD_SENSOR)
+  #include "../../feature/bedlevel/bdl/bdl.h"
 #endif
 
 #if ENABLED(SENSORLESS_HOMING)
@@ -46,12 +51,13 @@
 #endif
 
 #include "../../lcd/marlinui.h"
-#if ENABLED(DWIN_CREALITY_LCD)
-  #include "../../lcd/e3v2/creality/dwin.h"
-#endif
 
 #if ENABLED(EXTENSIBLE_UI)
   #include "../../lcd/extui/ui_api.h"
+#elif ENABLED(DWIN_CREALITY_LCD)
+  #include "../../lcd/e3v2/creality/dwin.h"
+#elif ENABLED(DWIN_LCD_PROUI)
+  #include "../../lcd/e3v2/proui/dwin.h"
 #endif
 
 #if ENABLED(PROBING_HEATERS_OFF)
@@ -59,11 +65,7 @@
   #include "../../module/printcounter.h"
 #endif
 
-#if HAS_L64XX                         // set L6470 absolute position registers to counts
-  #include "../../libs/L64XX/L64XX_Marlin.h"
-#endif
-
-#if ENABLED(LASER_MOVE_G28_OFF)
+#if ENABLED(LASER_FEATURE)
   #include "../../feature/spindle_laser.h"
 #endif
 
@@ -80,42 +82,33 @@
 
     const int x_axis_home_dir = TOOL_X_HOME_DIR(active_extruder);
 
-    const float mlx = max_length(X_AXIS),
-                mly = max_length(Y_AXIS),
-                mlratio = mlx > mly ? mly / mlx : mlx / mly,
-                fr_mm_s = _MIN(homing_feedrate(X_AXIS), homing_feedrate(Y_AXIS)) * SQRT(sq(mlratio) + 1.0);
+    // Use a higher diagonal feedrate so axes move at homing speed
+    const float minfr = _MIN(homing_feedrate(X_AXIS), homing_feedrate(Y_AXIS)),
+                fr_mm_s = HYPOT(minfr, minfr);
 
     #if ENABLED(SENSORLESS_HOMING)
       sensorless_t stealth_states {
-          tmc_enable_stallguard(stepperX)
-        , tmc_enable_stallguard(stepperY)
-        , false
-        , false
-          #if AXIS_HAS_STALLGUARD(X2)
-            || tmc_enable_stallguard(stepperX2)
-          #endif
-        , false
-          #if AXIS_HAS_STALLGUARD(Y2)
-            || tmc_enable_stallguard(stepperY2)
-          #endif
+        NUM_AXIS_LIST(
+          TERN0(X_SENSORLESS, tmc_enable_stallguard(stepperX)),
+          TERN0(Y_SENSORLESS, tmc_enable_stallguard(stepperY)),
+          false, false, false, false
+        )
+        , TERN0(X2_SENSORLESS, tmc_enable_stallguard(stepperX2))
+        , TERN0(Y2_SENSORLESS, tmc_enable_stallguard(stepperY2))
       };
     #endif
 
-    do_blocking_move_to_xy(1.5 * mlx * x_axis_home_dir, 1.5 * mly * Y_HOME_DIR, fr_mm_s);
+    do_blocking_move_to_xy(1.5 * max_length(X_AXIS) * x_axis_home_dir, 1.5 * max_length(Y_AXIS) * Y_HOME_DIR, fr_mm_s);
 
     endstops.validate_homing_move();
 
     current_position.set(0.0, 0.0);
 
     #if ENABLED(SENSORLESS_HOMING) && DISABLED(ENDSTOPS_ALWAYS_ON_DEFAULT)
-      tmc_disable_stallguard(stepperX, stealth_states.x);
-      tmc_disable_stallguard(stepperY, stealth_states.y);
-      #if AXIS_HAS_STALLGUARD(X2)
-        tmc_disable_stallguard(stepperX2, stealth_states.x2);
-      #endif
-      #if AXIS_HAS_STALLGUARD(Y2)
-        tmc_disable_stallguard(stepperY2, stealth_states.y2);
-      #endif
+      TERN_(X_SENSORLESS, tmc_disable_stallguard(stepperX, stealth_states.x));
+      TERN_(X2_SENSORLESS, tmc_disable_stallguard(stepperX2, stealth_states.x2));
+      TERN_(Y_SENSORLESS, tmc_disable_stallguard(stepperY, stealth_states.y));
+      TERN_(Y2_SENSORLESS, tmc_disable_stallguard(stepperY2, stealth_states.y2));
     #endif
   }
 
@@ -160,7 +153,7 @@
       homeaxis(Z_AXIS);
     }
     else {
-      LCD_MESSAGEPGM(MSG_ZPROBE_OUT);
+      LCD_MESSAGE(MSG_ZPROBE_OUT);
       SERIAL_ECHO_MSG(STR_ZPROBE_OUT_SER);
     }
   }
@@ -182,7 +175,7 @@
       motion_state.jerk_state = planner.max_jerk;
       planner.max_jerk.set(0, 0 OPTARG(DELTA, 0));
     #endif
-    planner.reset_acceleration_rates();
+    planner.refresh_acceleration_rates();
     return motion_state;
   }
 
@@ -191,7 +184,7 @@
     planner.settings.max_acceleration_mm_per_s2[Y_AXIS] = motion_state.acceleration.y;
     TERN_(DELTA, planner.settings.max_acceleration_mm_per_s2[Z_AXIS] = motion_state.acceleration.z);
     TERN_(HAS_CLASSIC_JERK, planner.max_jerk = motion_state.jerk_state);
-    planner.reset_acceleration_rates();
+    planner.refresh_acceleration_rates();
   }
 
 #endif // IMPROVE_HOMING_RELIABILITY
@@ -218,11 +211,16 @@ void GcodeSuite::G28() {
   DEBUG_SECTION(log_G28, "G28", DEBUGGING(LEVELING));
   if (DEBUGGING(LEVELING)) log_machine_info();
 
-  TERN_(LASER_MOVE_G28_OFF, cutter.set_inline_enabled(false));  // turn off laser
-
-  TERN_(FULL_REPORT_TO_HOST_FEATURE, set_and_report_grblstate(M_HOMING));
+  TERN_(BD_SENSOR, bdl.config_state = 0);
 
   IF_ENABLED(PROBING_HEATERS_OFF, const bool respect_leveling_heatup_settings = parser.seen('U') ? parser.value_bool() : true);
+
+  /**
+   * Set the laser power to false to stop the planner from processing the current power setting.
+   */
+  #if ENABLED(LASER_FEATURE)
+    planner.laser_inline.status.isPowered = false;
+  #endif
 
   #if ENABLED(DUAL_X_CARRIAGE)
     bool IDEX_saved_duplication_state = extruder_duplication_enabled;
@@ -231,7 +229,7 @@ void GcodeSuite::G28() {
 
   #if ENABLED(MARLIN_DEV_MODE)
     if (parser.seen_test('S')) {
-      LOOP_LINEAR_AXES(a) set_axis_is_at_home((AxisEnum)a);
+      LOOP_NUM_AXES(a) set_axis_is_at_home((AxisEnum)a);
       sync_plan_position();
       SERIAL_ECHOLNPGM("Simulated Homing");
       report_current_position();
@@ -245,7 +243,12 @@ void GcodeSuite::G28() {
     return;
   }
 
-  TERN_(DWIN_CREALITY_LCD, DWIN_StartHoming());
+  #if ENABLED(FULL_REPORT_TO_HOST_FEATURE)
+    const M_StateEnum old_grblstate = M_State_grbl;
+    set_and_report_grblstate(M_HOMING);
+  #endif
+
+  TERN_(HAS_DWIN_E3V2_BASIC, DWIN_HomingStart());
   TERN_(EXTENSIBLE_UI, ExtUI::onHomingStart());
 
   planner.synchronize();          // Wait for planner moves to finish!
@@ -270,38 +273,71 @@ void GcodeSuite::G28() {
   reset_stepper_timeout();
 
   #define HAS_CURRENT_HOME(N) (defined(N##_CURRENT_HOME) && N##_CURRENT_HOME != N##_CURRENT)
-  #if HAS_CURRENT_HOME(X) || HAS_CURRENT_HOME(X2) || HAS_CURRENT_HOME(Y) || HAS_CURRENT_HOME(Y2) || (ENABLED(DELTA) && HAS_CURRENT_HOME(Z))
+  #if HAS_CURRENT_HOME(X) || HAS_CURRENT_HOME(X2) || HAS_CURRENT_HOME(Y) || HAS_CURRENT_HOME(Y2) || (ENABLED(DELTA) && HAS_CURRENT_HOME(Z)) || HAS_CURRENT_HOME(I) || HAS_CURRENT_HOME(J) || HAS_CURRENT_HOME(K) || HAS_CURRENT_HOME(U) || HAS_CURRENT_HOME(V) || HAS_CURRENT_HOME(W)
     #define HAS_HOMING_CURRENT 1
   #endif
 
   #if HAS_HOMING_CURRENT
-    auto debug_current = [](PGM_P const s, const int16_t a, const int16_t b){
-      DEBUG_ECHOPGM_P(s); DEBUG_ECHOLNPAIR(" current: ", a, " -> ", b);
+    auto debug_current = [](FSTR_P const s, const int16_t a, const int16_t b) {
+      DEBUG_ECHOF(s); DEBUG_ECHOLNPGM(" current: ", a, " -> ", b);
     };
     #if HAS_CURRENT_HOME(X)
       const int16_t tmc_save_current_X = stepperX.getMilliamps();
       stepperX.rms_current(X_CURRENT_HOME);
-      if (DEBUGGING(LEVELING)) debug_current(PSTR("X"), tmc_save_current_X, X_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_X), tmc_save_current_X, X_CURRENT_HOME);
     #endif
     #if HAS_CURRENT_HOME(X2)
       const int16_t tmc_save_current_X2 = stepperX2.getMilliamps();
       stepperX2.rms_current(X2_CURRENT_HOME);
-      if (DEBUGGING(LEVELING)) debug_current(PSTR("X2"), tmc_save_current_X2, X2_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_X2), tmc_save_current_X2, X2_CURRENT_HOME);
     #endif
     #if HAS_CURRENT_HOME(Y)
       const int16_t tmc_save_current_Y = stepperY.getMilliamps();
       stepperY.rms_current(Y_CURRENT_HOME);
-      if (DEBUGGING(LEVELING)) debug_current(PSTR("Y"), tmc_save_current_Y, Y_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_Y), tmc_save_current_Y, Y_CURRENT_HOME);
     #endif
     #if HAS_CURRENT_HOME(Y2)
       const int16_t tmc_save_current_Y2 = stepperY2.getMilliamps();
       stepperY2.rms_current(Y2_CURRENT_HOME);
-      if (DEBUGGING(LEVELING)) debug_current(PSTR("Y2"), tmc_save_current_Y2, Y2_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_Y2), tmc_save_current_Y2, Y2_CURRENT_HOME);
     #endif
     #if HAS_CURRENT_HOME(Z) && ENABLED(DELTA)
       const int16_t tmc_save_current_Z = stepperZ.getMilliamps();
       stepperZ.rms_current(Z_CURRENT_HOME);
-      if (DEBUGGING(LEVELING)) debug_current(PSTR("Z"), tmc_save_current_Z, Z_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_Z), tmc_save_current_Z, Z_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(I)
+      const int16_t tmc_save_current_I = stepperI.getMilliamps();
+      stepperI.rms_current(I_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_I), tmc_save_current_I, I_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(J)
+      const int16_t tmc_save_current_J = stepperJ.getMilliamps();
+      stepperJ.rms_current(J_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_J), tmc_save_current_J, J_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(K)
+      const int16_t tmc_save_current_K = stepperK.getMilliamps();
+      stepperK.rms_current(K_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_K), tmc_save_current_K, K_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(U)
+      const int16_t tmc_save_current_U = stepperU.getMilliamps();
+      stepperU.rms_current(U_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_U), tmc_save_current_U, U_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(V)
+      const int16_t tmc_save_current_V = stepperV.getMilliamps();
+      stepperV.rms_current(V_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_V), tmc_save_current_V, V_CURRENT_HOME);
+    #endif
+    #if HAS_CURRENT_HOME(W)
+      const int16_t tmc_save_current_W = stepperW.getMilliamps();
+      stepperW.rms_current(W_CURRENT_HOME);
+      if (DEBUGGING(LEVELING)) debug_current(F(STR_W), tmc_save_current_W, W_CURRENT_HOME);
+    #endif
+    #if SENSORLESS_STALLGUARD_DELAY
+      safe_delay(SENSORLESS_STALLGUARD_DELAY); // Short delay needed to settle
     #endif
   #endif
 
@@ -346,48 +382,72 @@ void GcodeSuite::G28() {
     #define _UNSAFE(A) (homeZ && TERN0(Z_SAFE_HOMING, axes_should_home(_BV(A##_AXIS))))
 
     const bool homeZ = TERN0(HAS_Z_AXIS, parser.seen_test('Z')),
-               LINEAR_AXIS_LIST(              // Other axes should be homed before Z safe-homing
+               NUM_AXIS_LIST(              // Other axes should be homed before Z safe-homing
                  needX = _UNSAFE(X), needY = _UNSAFE(Y), needZ = false, // UNUSED
-                 needI = _UNSAFE(I), needJ = _UNSAFE(J), needK = _UNSAFE(K)
+                 needI = _UNSAFE(I), needJ = _UNSAFE(J), needK = _UNSAFE(K),
+                 needU = _UNSAFE(U), needV = _UNSAFE(V), needW = _UNSAFE(W)
                ),
-               LINEAR_AXIS_LIST(              // Home each axis if needed or flagged
+               NUM_AXIS_LIST(              // Home each axis if needed or flagged
                  homeX = needX || parser.seen_test('X'),
                  homeY = needY || parser.seen_test('Y'),
                  homeZZ = homeZ,
-                 homeI = needI || parser.seen_test(AXIS4_NAME), homeJ = needJ || parser.seen_test(AXIS5_NAME), homeK = needK || parser.seen_test(AXIS6_NAME),
+                 homeI = needI || parser.seen_test(AXIS4_NAME), homeJ = needJ || parser.seen_test(AXIS5_NAME),
+                 homeK = needK || parser.seen_test(AXIS6_NAME), homeU = needU || parser.seen_test(AXIS7_NAME),
+                 homeV = needV || parser.seen_test(AXIS8_NAME), homeW = needW || parser.seen_test(AXIS9_NAME)
                ),
-               home_all = LINEAR_AXIS_GANG(   // Home-all if all or none are flagged
+               home_all = NUM_AXIS_GANG(   // Home-all if all or none are flagged
                     homeX == homeX, && homeY == homeX, && homeZ == homeX,
-                 && homeI == homeX, && homeJ == homeX, && homeK == homeX
+                 && homeI == homeX, && homeJ == homeX, && homeK == homeX,
+                 && homeU == homeX, && homeV == homeX, && homeW == homeX
                ),
-               LINEAR_AXIS_LIST(
+               NUM_AXIS_LIST(
                  doX = home_all || homeX, doY = home_all || homeY, doZ = home_all || homeZ,
-                 doI = home_all || homeI, doJ = home_all || homeJ, doK = home_all || homeK
+                 doI = home_all || homeI, doJ = home_all || homeJ, doK = home_all || homeK,
+                 doU = home_all || homeU, doV = home_all || homeV, doW = home_all || homeW
                );
 
     #if HAS_Z_AXIS
       UNUSED(needZ); UNUSED(homeZZ);
     #else
       constexpr bool doZ = false;
+      #if !HAS_Y_AXIS
+        constexpr bool doY = false;
+      #endif
     #endif
 
+    // Z may home first, e.g., when homing away from the bed
     TERN_(HOME_Z_FIRST, if (doZ) homeaxis(Z_AXIS));
 
-    const float z_homing_height = parser.seenval('R') ? parser.value_linear_units() : Z_HOMING_HEIGHT;
+    // 'R' to specify a specific raise. 'R0' indicates no raise, e.g., for recovery.resume
+    // When 'R0' is used, there should already be adequate clearance, e.g., from homing Z to max.
+    const bool seenR = parser.seenval('R');
 
-    if (z_homing_height && (LINEAR_AXIS_GANG(doX, || doY, || TERN0(Z_SAFE_HOMING, doZ), || doI, || doJ, || doK))) {
-      // Raise Z before homing any other axes and z is not already high enough (never lower z)
-      if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPAIR("Raise Z (before homing) by ", z_homing_height);
-      do_z_clearance(z_homing_height);
-      TERN_(BLTOUCH, bltouch.init());
+    // Use raise given by 'R' or Z_HOMING_HEIGHT (above the probe trigger point)
+    float z_homing_height = seenR ? parser.value_linear_units() : Z_HOMING_HEIGHT;
+
+    // Check for any lateral motion that might require clearance
+    const bool may_skate = seenR || NUM_AXIS_GANG(doX, || doY, || TERN0(Z_SAFE_HOMING, doZ), || doI, || doJ, || doK, || doU, || doV, || doW);
+
+    if (seenR && z_homing_height == 0) {
+      if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("R0 = No Z raise");
     }
+    else if (z_homing_height && may_skate) {
+      // Raise Z before homing any other axes and z is not already high enough (never lower z)
+      if (DEBUGGING(LEVELING)) DEBUG_ECHOLNPGM("Raise Z before homing:");
+      do_z_clearance(z_homing_height);
+    }
+
+    // Init BLTouch ahead of any lateral motion, even if not homing with the probe
+    TERN_(BLTOUCH, if (may_skate) bltouch.init());
 
     // Diagonal move first if both are homing
     TERN_(QUICK_HOME, if (doX && doY) quick_home_xy());
 
-    // Home Y (before X)
-    if (ENABLED(HOME_Y_BEFORE_X) && (doY || TERN0(CODEPENDENT_XY_HOMING, doX)))
-      homeaxis(Y_AXIS);
+    #if HAS_Y_AXIS
+      // Home Y (before X)
+      if (ENABLED(HOME_Y_BEFORE_X) && (doY || TERN0(CODEPENDENT_XY_HOMING, doX)))
+        homeaxis(Y_AXIS);
+    #endif
 
     // Home X
     if (doX || (doY && ENABLED(CODEPENDENT_XY_HOMING) && DISABLED(HOME_Y_BEFORE_X))) {
@@ -415,50 +475,71 @@ void GcodeSuite::G28() {
       #endif
     }
 
-    // Home Y (after X)
-    if (DISABLED(HOME_Y_BEFORE_X) && doY)
-      homeaxis(Y_AXIS);
+    #if BOTH(FOAMCUTTER_XYUV, HAS_I_AXIS)
+      // Home I (after X)
+      if (doI) homeaxis(I_AXIS);
+    #endif
+
+    #if HAS_Y_AXIS
+      // Home Y (after X)
+      if (DISABLED(HOME_Y_BEFORE_X) && doY)
+        homeaxis(Y_AXIS);
+    #endif
+
+    #if BOTH(FOAMCUTTER_XYUV, HAS_J_AXIS)
+      // Home J (after Y)
+      if (doJ) homeaxis(J_AXIS);
+    #endif
 
     TERN_(IMPROVE_HOMING_RELIABILITY, end_slow_homing(saved_motion_state));
 
-    // Home Z last if homing towards the bed
-    #if HAS_Z_AXIS && DISABLED(HOME_Z_FIRST)
-      if (doZ) {
-        #if EITHER(Z_MULTI_ENDSTOPS, Z_STEPPER_AUTO_ALIGN)
-          stepper.set_all_z_lock(false);
-          stepper.set_separate_multi_axis(false);
-        #endif
+    #if ENABLED(FOAMCUTTER_XYUV)
+      // skip homing of unused Z axis for foamcutters
+      if (doZ) set_axis_is_at_home(Z_AXIS);
+    #else
+      // Home Z last if homing towards the bed
+      #if HAS_Z_AXIS && DISABLED(HOME_Z_FIRST)
+        if (doZ) {
+          #if EITHER(Z_MULTI_ENDSTOPS, Z_STEPPER_AUTO_ALIGN)
+            stepper.set_all_z_lock(false);
+            stepper.set_separate_multi_axis(false);
+          #endif
 
-        TERN(Z_SAFE_HOMING, home_z_safely(), homeaxis(Z_AXIS));
-        float z_offset_backup;
-        z_offset_backup = probe.offset.z;
-        ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(probe.offset.z, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
-        probe.offset.z = z_offset_backup;
-        probe.move_z_after_homing();
+          #if ENABLED(Z_SAFE_HOMING)
+            if (TERN1(POWER_LOSS_RECOVERY, !parser.seen_test('H'))) home_z_safely(); else homeaxis(Z_AXIS);
+          #else
+            homeaxis(Z_AXIS);
+            #if ENABLED(DGUS_LCD_UI_CREALITY_TOUCH)
+              float z_offset_backup;
+              z_offset_backup = probe.offset.z;
+              ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(probe.offset.z, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);
+              probe.offset.z = z_offset_backup;
+            #endif
 
-        #if ENABLED(PROBING_HEATERS_OFF)
-          // If we're going to print then we must ensure we are back on temperature before we continue
-          if (respect_leveling_heatup_settings && TERN1(HAS_PROBE_SETTINGS, probe.settings.turn_heaters_off && probe.settings.stabilize_temperatures_after_probing) && (queue.has_commands_queued() || planner.has_blocks_queued() || print_job_timer.isRunning())) {
-            SERIAL_ECHOLN("Waiting to heat-up again before continueing");
-            ui.set_status("Waiting for heat-up...");
+          #endif
+          probe.move_z_after_homing();
+            #if ENABLED(PROBING_HEATERS_OFF)
+                // If we're going to print then we must ensure we are back on temperature before we continue
+                  if (respect_leveling_heatup_settings && TERN1(HAS_PROBE_SETTINGS, probe.settings.turn_heaters_off && probe.settings.stabilize_temperatures_after_probing) && (queue.has_commands_queued() || planner.has_blocks_queued() || print_job_timer.isRunning())) {
+                    SERIAL_ECHOLN("Waiting to heat-up again before continueing");
+                    ui.set_status("Waiting for heat-up...");
+                    thermalManager.wait_for_hotend(0);
+                    thermalManager.wait_for_bed_heating();
+                  }
+            #endif
+        }
+      #endif
 
-            thermalManager.wait_for_hotend(0);
-            thermalManager.wait_for_bed_heating();
-          }
-        #endif
-      }
+      SECONDARY_AXIS_CODE(
+        if (doI) homeaxis(I_AXIS),
+        if (doJ) homeaxis(J_AXIS),
+        if (doK) homeaxis(K_AXIS),
+        if (doU) homeaxis(U_AXIS),
+        if (doV) homeaxis(V_AXIS),
+        if (doW) homeaxis(W_AXIS)
+      );
     #endif
 
-    #if LINEAR_AXES >= 4
-      if (doI) homeaxis(I_AXIS);
-    #endif
-    #if LINEAR_AXES >= 5
-      if (doJ) homeaxis(J_AXIS);
-    #endif
-    #if LINEAR_AXES >= 6
-      if (doK) homeaxis(K_AXIS);
-    #endif
-    
     sync_plan_position();
 
   #endif
@@ -540,34 +621,30 @@ void GcodeSuite::G28() {
     #if HAS_CURRENT_HOME(K)
       stepperK.rms_current(tmc_save_current_K);
     #endif
+    #if HAS_CURRENT_HOME(U)
+      stepperU.rms_current(tmc_save_current_U);
+    #endif
+    #if HAS_CURRENT_HOME(V)
+      stepperV.rms_current(tmc_save_current_V);
+    #endif
+    #if HAS_CURRENT_HOME(W)
+      stepperW.rms_current(tmc_save_current_W);
+    #endif
+    #if SENSORLESS_STALLGUARD_DELAY
+      safe_delay(SENSORLESS_STALLGUARD_DELAY); // Short delay needed to settle
+    #endif
   #endif // HAS_HOMING_CURRENT
 
   ui.refresh();
 
-  TERN_(DWIN_CREALITY_LCD, DWIN_CompletedHoming());
-  TERN_(EXTENSIBLE_UI, ExtUI::onHomingComplete());
+  TERN_(HAS_DWIN_E3V2_BASIC, DWIN_HomingDone());
+  TERN_(EXTENSIBLE_UI, ExtUI::onHomingDone());
 
   report_current_position();
 
   if (ENABLED(NANODLP_Z_SYNC) && (doZ || ENABLED(NANODLP_ALL_AXIS)))
     SERIAL_ECHOLNPGM(STR_Z_MOVE_COMP);
 
-  TERN_(FULL_REPORT_TO_HOST_FEATURE, set_and_report_grblstate(M_IDLE));
+  TERN_(FULL_REPORT_TO_HOST_FEATURE, set_and_report_grblstate(old_grblstate));
 
-  #if HAS_L64XX
-    // Set L6470 absolute position registers to counts
-    // constexpr *might* move this to PROGMEM.
-    // If not, this will need a PROGMEM directive and an accessor.
-    #define _EN_ITEM(N) , E_AXIS
-    static constexpr AxisEnum L64XX_axis_xref[MAX_L64XX] = {
-      LINEAR_AXIS_LIST(X_AXIS, Y_AXIS, Z_AXIS, I_AXIS, J_AXIS, K_AXIS),
-      X_AXIS, Y_AXIS, Z_AXIS, Z_AXIS, Z_AXIS
-      REPEAT(E_STEPPERS, _EN_ITEM)
-    };
-    #undef _EN_ITEM
-    for (uint8_t j = 1; j <= L64XX::chain[0]; j++) {
-      const uint8_t cv = L64XX::chain[j];
-      L64xxManager.set_param((L64XX_axis_t)cv, L6470_ABS_POS, stepper.position(L64XX_axis_xref[cv]));
-    }
-  #endif
 }

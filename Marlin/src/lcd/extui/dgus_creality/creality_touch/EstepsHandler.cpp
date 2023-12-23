@@ -11,7 +11,7 @@
 
 #include "../../ui_api.h"
 #include "../../../marlinui.h"
-
+#include "../../../../libs/buzzer.h"
 #include "../../../../module/temperature.h"
 #include "../../../../module/settings.h"
 #include "../../../../module/planner.h"
@@ -77,7 +77,7 @@ void EstepsHandler::HandleStartButton(DGUS_VP_Variable &var, void *val_ptr) {
     GcodeSuite::set_relative_mode(true);
 
     ExtUI::injectCommands_P("G0 Z5 F150");
-    //SERIAL_ECHOLNPAIR("Executing: ", cmd);
+    //SERIAL_ECHOLNPGM("Executing: ", cmd);
     queue.advance();
 
     // Heat up if necessary
@@ -98,7 +98,7 @@ void EstepsHandler::HandleStartButton(DGUS_VP_Variable &var, void *val_ptr) {
     char str_temp[6];
     dtostrf(filament_to_extrude, 3, 1, str_temp);
     sprintf_P(cmd, PSTR("G1 E%s F90"), str_temp);
-    SERIAL_ECHOLNPAIR("Executing: ", cmd);
+    SERIAL_ECHOLNPGM("Executing: ", cmd);
 
     ExtUI::injectCommands(cmd);
     queue.advance();
@@ -106,7 +106,7 @@ void EstepsHandler::HandleStartButton(DGUS_VP_Variable &var, void *val_ptr) {
 
     // Restore position
     ExtUI::injectCommands_P("G0 Z-5 F150");
-    //SERIAL_ECHOLNPAIR("Executing: ", cmd);
+    //SERIAL_ECHOLNPGM("Executing: ", cmd);
     queue.advance();
     planner.synchronize();
 
@@ -171,11 +171,11 @@ void EstepsHandler::HandleRemainingFilament(DGUS_VP_Variable &var, void *val_ptr
     }
 
     float current_steps = ExtUI::getAxisSteps_per_mm(ExtUI::E0);
-    SERIAL_ECHOLNPAIR("Current steps: ", current_steps);
-    SERIAL_ECHOLNPAIR("Actual extrusion: ", actualExtrusion);
+    SERIAL_ECHOLNPGM("Current steps: ", current_steps);
+    SERIAL_ECHOLNPGM("Actual extrusion: ", actualExtrusion);
 
     float new_steps = (current_steps * filament_to_extrude) / actualExtrusion;
-    SERIAL_ECHOLNPAIR("New steps: ", new_steps);
+    SERIAL_ECHOLNPGM("New steps: ", new_steps);
 
     calculated_esteps = new_steps;
 

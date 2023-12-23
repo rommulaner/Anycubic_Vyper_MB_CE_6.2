@@ -50,8 +50,8 @@ inline void reset_bricks(const uint16_t v) {
 void reset_ball() {
   constexpr uint8_t ball_dist = 24;
   bdat.bally = BTOF(PADDLE_Y - ball_dist);
-  bdat.ballv = FTOP(1.3f);
-  bdat.ballh = -FTOP(1.25f);
+  bdat.ballv = FTOF(1.3f);
+  bdat.ballh = -FTOF(1.25f);
   uint8_t bx = bdat.paddle_x + (PADDLE_W) / 2 + ball_dist;
   if (bx >= LCD_PIXEL_WIDTH - 10) { bx -= ball_dist * 2; bdat.ballh = -bdat.ballh; }
   bdat.ballx = BTOF(bx);
@@ -117,13 +117,11 @@ void BrickoutGame::game_screen() {
           }
           else if (diff <= 3) {
             bdat.ballh += fixed_t(random(-64, 0));
-            NOLESS(bdat.ballh, BTOF(-2));
-            NOMORE(bdat.ballh, BTOF(2));
+            LIMIT(bdat.ballh, BTOF(-2), BTOF(2));
           }
           else if (diff >= PADDLE_W-1 - 3) {
             bdat.ballh += fixed_t(random( 0, 64));
-            NOLESS(bdat.ballh, BTOF(-2));
-            NOMORE(bdat.ballh, BTOF(2));
+            LIMIT(bdat.ballh, BTOF(-2), BTOF(2));
           }
 
           // Paddle hit after clearing the board? Reset the board.

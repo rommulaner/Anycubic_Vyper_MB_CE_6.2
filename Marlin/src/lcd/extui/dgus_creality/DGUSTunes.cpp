@@ -40,6 +40,7 @@
 #include "DGUSTunes.h"
 #include "DGUSScreenHandler.h"
 #include "../ui_api.h"
+#include "../../../libs/buzzer.h"
 
 //using namespace ExtUI;
 

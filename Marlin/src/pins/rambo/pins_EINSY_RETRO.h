@@ -23,6 +23,10 @@
 
 /**
  * Einsy-Retro pin assignments
+ * Schematic (1.0b): https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Einsy-Retro/Schematic%20Prints_EinsyRetro_1.0b.PDF
+ * Origin (1.0b): https://github.com/ultimachine/EinsyRetro/blob/master/board/Project%20Outputs/Schematic%20Prints_EinsyRetro_1.0b.PDF
+ * Schematic (1.0c): https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Einsy-Retro/Schematic%20Prints_EinsyRetro_1.0c.PDF
+ * Origin (1.0c): https://github.com/ultimachine/EinsyRetro/blob/master/board/Project%20Outputs/Schematic%20Prints_EinsyRetro_1.0c.PDF
  */
 
 #include "env_validate.h"
@@ -55,7 +59,6 @@
 
   #define X_MIN_PIN                           12  // X-
   #define Y_MIN_PIN                           11  // Y-
-  #define Z_MIN_PIN                           10  // Z-
   #define X_MAX_PIN                           81  // X+
   #define Y_MAX_PIN                           57  // Y+
 
@@ -78,15 +81,16 @@
   #endif
 
   #if ENABLED(BLTOUCH)
-    #define Z_MIN_PIN                         11  // Y-MIN
-    #define SERVO0_PIN                        10  // Z-MIN
-  #else
-    #define Z_MIN_PIN                         10
+    #define Z_MIN_PIN                         11  // Y-
+    #define SERVO0_PIN                        10  // Z-
   #endif
 
 #endif
 
 #define Z_MAX_PIN                              7
+#ifndef Z_MIN_PIN
+  #define Z_MIN_PIN                           10  // Z-
+#endif
 
 //
 // Z Probe (when not Z_MIN_PIN)
@@ -157,9 +161,11 @@
 //
 // Průša i3 MK2 Multiplexer Support
 //
-#define E_MUX0_PIN                            17
-#define E_MUX1_PIN                            16
-#define E_MUX2_PIN                            78  // 84 in MK2 Firmware, with BEEPER as 78
+#if HAS_PRUSA_MMU1
+  #define E_MUX0_PIN                          17
+  #define E_MUX1_PIN                          16
+  #define E_MUX2_PIN                          78  // 84 in MK2 Firmware, with BEEPER as 78
+#endif
 
 //
 // LCD / Controller
@@ -199,3 +205,10 @@
   #endif // IS_ULTIPANEL || TOUCH_UI_ULTIPANEL || TOUCH_UI_FTDI_EVE
 
 #endif // HAS_WIRED_LCD || TOUCH_UI_ULTIPANEL || TOUCH_UI_FTDI_EVE
+
+// Alter timing for graphical display
+#if IS_U8GLIB_ST7920
+  #define BOARD_ST7920_DELAY_1                 0
+  #define BOARD_ST7920_DELAY_2               250
+  #define BOARD_ST7920_DELAY_3                 0
+#endif

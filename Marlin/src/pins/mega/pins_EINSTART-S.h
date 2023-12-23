@@ -23,6 +23,7 @@
 
 /**
  * Einstart-S pin assignments
+ * ATmega2560, ATmega1280
  * PCB Silkscreen: 3DPrinterCon_v3.5
  */
 
@@ -101,9 +102,9 @@
 // LCD Display input pins
 //
 #define BTN_UP                                25
-#define BTN_DWN                               26
-#define BTN_LFT                               27
-#define BTN_RT                                28
+#define BTN_DOWN                              26
+#define BTN_LEFT                              27
+#define BTN_RIGHT                             28
 
 // 'OK' button
 #define BTN_ENC                               29

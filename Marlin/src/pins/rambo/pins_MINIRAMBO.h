@@ -23,6 +23,10 @@
 
 /**
  * Mini-RAMBo pin assignments
+ * Schematic (1.3a): https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Mini%20RAMBo/Mini-Rambo.PDF
+ * Origin (1.3a): https://github.com/ultimachine/Mini-Rambo/blob/1.3a/board/Project%20Outputs%20for%20Mini-Rambo/Mini-Rambo.PDF
+ * Schematic (1.0a): https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Mini%20RAMBo%201.0a/Mini-Rambo.PDF
+ * Origin (1.0a): https://github.com/ultimachine/Mini-Rambo/blob/v1.1b/board/Project%20Outputs%20for%20Mini-Rambo/Mini-Rambo.PDF
  */
 
 #include "env_validate.h"
@@ -69,7 +73,7 @@
 #define E0_DIR_PIN                            43
 #define E0_ENABLE_PIN                         26
 
-// Microstepping pins - Mapping not from fastio.h (?)
+// Microstepping pins
 #define X_MS1_PIN                             40
 #define X_MS2_PIN                             41
 #define Y_MS1_PIN                             69
@@ -130,10 +134,12 @@
 //
 // Průša i3 MK2 Multiplexer Support
 //
-#define E_MUX0_PIN                            17
-#define E_MUX1_PIN                            16
-#if !MB(MINIRAMBO_10A)
-  #define E_MUX2_PIN                          78  // 84 in MK2 Firmware, with BEEPER as 78
+#if HAS_PRUSA_MMU1
+  #define E_MUX0_PIN                          17
+  #define E_MUX1_PIN                          16
+  #if !MB(MINIRAMBO_10A)
+    #define E_MUX2_PIN                        78  // 84 in MK2 Firmware, with BEEPER as 78
+  #endif
 #endif
 
 //
@@ -192,3 +198,9 @@
   #endif // IS_ULTIPANEL || TOUCH_UI_ULTIPANEL
 
 #endif // HAS_WIRED_LCD || TOUCH_UI_ULTIPANEL
+
+#if IS_U8GLIB_ST7920
+  #define BOARD_ST7920_DELAY_1                 0
+  #define BOARD_ST7920_DELAY_2               250
+  #define BOARD_ST7920_DELAY_3                 0
+#endif

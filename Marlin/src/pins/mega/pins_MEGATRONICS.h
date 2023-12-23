@@ -23,6 +23,9 @@
 
 /**
  * MegaTronics pin assignments
+ * Schematic: https://green-candy.osdn.jp/external/MarlinFW/board_schematics/MegaTronics/Megatronics_1_0_sch.pdf
+ * Origin: https://reprap.org/mediawiki/images/a/a3/Megatronics_1_0_sch.pdf
+ * ATmega2560
  */
 
 #include "env_validate.h"
@@ -106,7 +109,7 @@
 //
 #define BEEPER_PIN                            33
 
-#if IS_ULTRA_LCD && IS_NEWPANEL
+#if HAS_WIRED_LCD && IS_NEWPANEL
 
   #define LCD_PINS_RS                         16
   #define LCD_PINS_ENABLE                     17
@@ -122,7 +125,7 @@
 
   #define SD_DETECT_PIN                       -1  // RAMPS doesn't use this
 
-#endif // IS_ULTRA_LCD && IS_NEWPANEL
+#endif // HAS_WIRED_LCD && IS_NEWPANEL
 
 //
 // M3/M4/M5 - Spindle/Laser Control

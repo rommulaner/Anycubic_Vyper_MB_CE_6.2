@@ -23,10 +23,13 @@
 
 /**
  * Mega controller pin assignments
+ * Schematic: https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Mega%20Controller/Mega_controller.pdf
+ * Origin: https://reprap.org/mediawiki/images/b/ba/Mega_controller.pdf
+ * ATmega2560
  */
 
 #if HOTENDS > 2 || E_STEPPERS > 2
-  #error "Mega Controller supports up to 2 hotends / E-steppers. Comment out this line to continue."
+  #error "Mega Controller supports up to 2 hotends / E steppers."
 #endif
 
 #include "env_validate.h"
@@ -121,7 +124,7 @@
   #define CONTROLLER_FAN_PIN            FAN2_PIN
 #endif
 
-#define FAN_SOFT_PWM
+#define FAN_SOFT_PWM_REQUIRED
 
 //
 // Misc. Functions
@@ -139,23 +142,20 @@
 #if ENABLED(MINIPANEL)
 
   #define BEEPER_PIN                          46
-  // Pins for DOGM SPI LCD Support
+
   #define DOGLCD_A0                           47
   #define DOGLCD_CS                           45
   #define LCD_BACKLIGHT_PIN                   44  // backlight LED on PA3
 
   #define KILL_PIN                            12
-  // GLCD features
-  // Uncomment screen orientation
-  //#define LCD_SCREEN_ROT_90
-  //#define LCD_SCREEN_ROT_180
-  //#define LCD_SCREEN_ROT_270
 
   #define BTN_EN1                             48
   #define BTN_EN2                             11
   #define BTN_ENC                             10
 
   #define SD_DETECT_PIN                       49
+
+  //#define LCD_SCREEN_ROTATE                180  // 0, 90, 180, 270
 
 #endif // MINIPANEL
 

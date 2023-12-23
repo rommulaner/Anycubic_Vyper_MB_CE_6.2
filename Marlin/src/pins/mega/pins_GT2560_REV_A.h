@@ -25,6 +25,9 @@
  * Geeetech GT2560 Revision A board pin assignments, based on the work of
  * George Robles (https://georges3dprinters.com) and
  * Richard Smith <galorin@gmail.com>
+ * Schematic: https://green-candy.osdn.jp/external/MarlinFW/board_schematics/Geeetech%20GT2560%20Revision%20A/GT2560_sch.pdf
+ * Origin: https://www.geeetech.com/wiki/images/9/90/GT2560_sch.pdf
+ * ATmega2560
  */
 
 #define ALLOW_MEGA1280
@@ -127,7 +130,7 @@
 
       #define LCD_RESET_PIN                   16
 
-      #define DEFAULT_LCD_CONTRAST           220
+      #define LCD_CONTRAST_INIT              220
 
       #define LCD_BACKLIGHT_PIN               -1
     #else
