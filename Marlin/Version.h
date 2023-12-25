@@ -33,43 +33,43 @@
 
 #ifdef VYPER_NOZZLE_HOMING
     #ifdef VYPER_BUILD
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(CJ+N)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(CJ+N)"
     #elif defined VYPER_BUILD_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(CJ+IS+N)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(CJ+IS+N)"
     #elif defined VYPER_BUILD_LA
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+N)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+N)"
     #elif defined VYPER_BUILD_LA_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+IS+N)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+IS+N)"
     #elif defined VYPER_BUILD_LA_T
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+T+N)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+T+N)"
     #elif defined VYPER_BUILD_LA_T_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+T+IS+N)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+T+IS+N)"
     #elif defined VYPER_BUILD_LA_TE
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+TE+N)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+TE+N)"
     #elif defined VYPER_BUILD_LA_TE_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+TE+IS+N)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+TE+IS+N)"
     #else
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2"
     #endif
 #else
     #ifdef VYPER_BUILD
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(CJ)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(CJ)"
     #elif defined VYPER_BUILD_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(CJ+IS)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(CJ+IS)"
     #elif defined VYPER_BUILD_LA
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA)"
     #elif defined VYPER_BUILD_LA_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+IS)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+IS)"
     #elif defined VYPER_BUILD_LA_T
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+T)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+T)"
     #elif defined VYPER_BUILD_LA_T_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+T+IS)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+T+IS)"
     #elif defined VYPER_BUILD_LA_TE
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+TE)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+TE)"
     #elif defined VYPER_BUILD_LA_TE_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d(LA+TE+IS)"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2(LA+TE+IS)"
     #else
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.1d"
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2"
     #endif
 #endif
 
