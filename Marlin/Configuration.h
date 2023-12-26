@@ -69,6 +69,8 @@
 //#define VYPER_BUILD_LA_T_IS    // as above but with uart connection to TMC2209's for x, y, z and z2
 //#define VYPER_BUILD_LA_TE_IS   // as above but with software serial connection to e stepper
 
+#define GRID_MAX_POINTS_X 7   // moved here for easier change of the bed leveling mesh size
+
 // Leave undefined to home Z using two Z sensors (stock configuration)
 //#define VYPER_NOZZLE_HOMING // home Z using nozzle sensor at middle of bed
 
@@ -651,14 +653,14 @@
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
-#define HEATER_0_MAXTEMP 275
-#define HEATER_1_MAXTEMP 275
-#define HEATER_2_MAXTEMP 275
-#define HEATER_3_MAXTEMP 275
-#define HEATER_4_MAXTEMP 275
-#define HEATER_5_MAXTEMP 275
-#define HEATER_6_MAXTEMP 275
-#define HEATER_7_MAXTEMP 275
+#define HEATER_0_MAXTEMP 275 //275 original
+#define HEATER_1_MAXTEMP 275 //275 original
+#define HEATER_2_MAXTEMP 275 //275 original
+#define HEATER_3_MAXTEMP 275 //275 original
+#define HEATER_4_MAXTEMP 275 //275 original
+#define HEATER_5_MAXTEMP 275 //275 original
+#define HEATER_6_MAXTEMP 275 //275 original
+#define HEATER_7_MAXTEMP 275 //275 original
 #define BED_MAXTEMP      120
 #define CHAMBER_MAXTEMP  60
 
@@ -1566,7 +1568,7 @@
 #if ENABLED(PROBE_TARE)
   #define PROBE_TARE_TIME  300    // (ms) Time to hold tare pin
   #define PROBE_TARE_DELAY 250    // (ms) Delay after tare before
-  #define PROBE_TARE_STATE HIGH   // State to write pin for tare
+  #define PROBE_TARE_STATE LOW   // State to write pin for tare
   //#define PROBE_TARE_PIN PA5    // Override default pin
   #if ENABLED(PROBE_ACTIVATION_SWITCH)
     //#define PROBE_TARE_ONLY_WHILE_INACTIVE  // Fail to tare/probe if PROBE_ACTIVATION_SWITCH is active
@@ -2006,7 +2008,7 @@
 #if EITHER(AUTO_BED_LEVELING_LINEAR, AUTO_BED_LEVELING_BILINEAR)
 
   // Set the number of grid points per dimension.
-  #define GRID_MAX_POINTS_X 4
+  //#define GRID_MAX_POINTS_X 4   //configured in the beginning at the vyper versions
   #define GRID_MAX_POINTS_Y GRID_MAX_POINTS_X
 
   // Probe along the Y axis, advancing X after each column

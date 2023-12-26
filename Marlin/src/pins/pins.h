@@ -631,6 +631,8 @@
   #include "stm32f1/pins_SOVOL_V131.h"          // GD32F1                                 env:GD32F103RET6_sovol_maple
 #elif MB(TRIGORILLA_V006)
   #include "stm32f1/pins_TRIGORILLA_V006.h"     // GD32F1                                 env:trigorilla_v006
+#elif MB(AC_TRI_F1_V1)
+  #include "stm32f1/pins_AC_TRI_F1_V1.h"       	// STM32F103RE                            env:STM32F103RET6_ac_tri_f1 env:STM32F103RET6_ac_tri_f1_maple
 
 //
 // ARM Cortex-M4F
