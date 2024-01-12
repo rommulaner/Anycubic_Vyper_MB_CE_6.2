@@ -109,10 +109,11 @@
 #define AUTO_LEVEL_RX_PIN                   PB12
 
 #ifndef Z_MIN_PROBE_PIN
-  #define Z_MIN_PROBE_PIN      AUTO_LEVEL_RX_PIN
+  #define Z_MIN_PROBE_PIN                   AUTO_LEVEL_RX_PIN
 #endif
 
-#define PROBE_TARE_PIN       AUTO_LEVEL_TX_PIN    //was AUTO_LEVEL_RX_PIN   //Tare PIN was missing
+#define PROBE_TARE_PIN                      AUTO_LEVEL_TX_PIN    //was AUTO_LEVEL_RX_PIN which was wrong   //Tare PIN was missing
+#define PROBE_ACTIVATION_SWITCH_PIN         Z_MIN_PIN
 
 
 //

@@ -69,7 +69,7 @@
 //#define VYPER_BUILD_LA_T_IS    // as above but with uart connection to TMC2209's for x, y, z and z2
 //#define VYPER_BUILD_LA_TE_IS   // as above but with software serial connection to e stepper
 
-#define GRID_MAX_POINTS_X 7   // moved here for easier change of the bed leveling mesh size
+#define GRID_MAX_POINTS_X 4   // moved here for easier change of the bed leveling mesh size
 
 // Leave undefined to home Z using two Z sensors (stock configuration)
 //#define VYPER_NOZZLE_HOMING // home Z using nozzle sensor at middle of bed
@@ -1612,7 +1612,7 @@
  */
 #define Z_CLEARANCE_DEPLOY_PROBE    10 // Z Clearance for Deploy/Stow
 #define Z_CLEARANCE_BETWEEN_PROBES  5 // Z Clearance between probe points
-#define Z_CLEARANCE_MULTI_PROBE     2 // Z Clearance between multiple probes
+#define Z_CLEARANCE_MULTI_PROBE     5 // Z Clearance between multiple probes
 //#define Z_AFTER_PROBING           5 // Z position after probing is done
 
 #if ENABLED(VYPER_NOZZLE_HOMING)
@@ -1978,7 +1978,7 @@
    */
   #define ENABLE_LEVELING_FADE_HEIGHT
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-    #define DEFAULT_LEVELING_FADE_HEIGHT 10.0 // (mm) Default fade height.
+    #define DEFAULT_LEVELING_FADE_HEIGHT 0.0 // (mm) Default fade height.
   #endif
 
   /**
