@@ -34,6 +34,7 @@ typedef struct {
   
   uint16_t preheat_hotend_temp;
   uint16_t preheat_bed_temp;
+  float static_z_offset;
 
   bool stabilize_temperatures_after_probing;
 } probe_settings_t;

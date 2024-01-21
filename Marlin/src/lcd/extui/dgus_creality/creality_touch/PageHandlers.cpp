@@ -89,7 +89,7 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
             switch (buttonValue) {
                 case 1:
                     queue.enqueue_now_P("G28 U0");                      //home all axis
-                    queue.enqueue_now_P("G0 Z5");                       //raise z
+                    queue.enqueue_now_P("G0 Z5 F240");                  //raise z
                     sprintf(Buffer, "G0 X%d Y%d F4800", X_CENTER, Y_CENTER);  
                     queue.enqueue_now_P(Buffer);                        //move nozzle to mid of bed in x an y
                     queue.enqueue_now_P("G1 Z0 F120");                  //lower nozzle to bed for adjusting z-offset
@@ -99,7 +99,6 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
                     if (all_axes_trusted()) {
                         // Increase Z-offset 
                         ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(0.01, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
-                        queue.enqueue_now_P("M500");
                         ScreenHandler.ForceCompleteUpdate();
                         ScreenHandler.RequestSaveSettings();
                     }
@@ -109,11 +108,37 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
                     if (all_axes_trusted()) {
                         // Decrease Z-offset
                         ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(-0.01, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
-                        queue.enqueue_now_P("M500");
                         ScreenHandler.ForceCompleteUpdate();
                         ScreenHandler.RequestSaveSettings();
                     }    
                     break;
+
+                case 4:
+                    if (all_axes_trusted()) {
+                        // Increase static Z-offset
+                        float z_offset_backup;
+                        z_offset_backup = probe.offset.z;
+                        ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(0.05, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
+                        probe.settings.static_z_offset = probe.settings.static_z_offset + 0.05;
+                        probe.offset.z = z_offset_backup;
+                        ScreenHandler.ForceCompleteUpdate();
+                        ScreenHandler.RequestSaveSettings();
+                    }
+                    break;
+                    
+                case 5:
+                    if (all_axes_trusted()) {
+                        // Decrease static Z-offset
+                        float z_offset_backup;
+                        z_offset_backup = probe.offset.z;
+                        ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(-0.05, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
+                        probe.settings.static_z_offset = probe.settings.static_z_offset - 0.05;
+                        probe.offset.z = z_offset_backup;
+                        ScreenHandler.ForceCompleteUpdate();
+                        ScreenHandler.RequestSaveSettings();
+                    }    
+                    break;
+
             }
             break;
 
@@ -143,7 +168,7 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
                 ExtUI::injectCommands_P("G28 U0\nG34\nG29 U0");
             #else
                 probe.offset.z = 0;                                  //zero Z-offset
-                ExtUI::injectCommands_P("G28 U0\nG29 U0");  //home all axis, start bed leveling
+                ExtUI::injectCommands_P("G28 U0\nG29 U0");  //home all axis, start bed leveling, U0 is for probe heaters function
             #endif
 #if HAS_MESH
             ScreenHandler.ResetMeshValues();
@@ -381,7 +406,7 @@ void MoveHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
             ScreenHandler.GotoScreen(DGUSLCD_SCREEN_MOVE01MM, false);
             break;
         case 4:
-            // Temporary copy probe settings so we home without preheating, then restore setings afterward
+            // Temporary copy probe settings so we home without preheating, then restore settings afterward
             #if ALL(HAS_BED_PROBE, HAS_PROBE_SETTINGS)
                 auto prev_probe_settings = probe.settings;
                 probe.settings.preheat_bed_temp = 0;

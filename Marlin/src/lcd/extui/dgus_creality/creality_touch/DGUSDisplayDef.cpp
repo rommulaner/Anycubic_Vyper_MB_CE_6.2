@@ -86,7 +86,7 @@ const char MarlinVersion[] PROGMEM = SHORT_BUILD_VERSION;
 #endif
 
 #define VPList_Common VP_BACK_BUTTON_STATE
-#define VPList_CommonWithStatus VPList_HeatHotend VPList_HeatBed VP_Z_OFFSET, VP_Feedrate_Percentage, VP_BACK_BUTTON_STATE
+#define VPList_CommonWithStatus VPList_HeatHotend VPList_HeatBed VP_Z_OFFSET, VP_STATIC_Z_OFFSET, VP_Feedrate_Percentage, VP_BACK_BUTTON_STATE
 #define VPList_CommonWithHeatOnly VPList_HeatHotend VPList_HeatBed VP_BACK_BUTTON_STATE
 
 // ----- Which variables to auto-update on which screens
@@ -174,6 +174,7 @@ const uint16_t VPList_PrintPausingError[] PROGMEM = {
   VP_Y_POSITION,
   VP_Z_POSITION_PRECISION,
   VP_Z_OFFSET,
+  VP_STATIC_Z_OFFSET,
   VP_Fan0_Percentage,
   VP_Feedrate_Percentage,
 
@@ -643,6 +644,7 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
 
 #if ENABLED(HAS_BED_PROBE)
   VPHELPER(VP_Z_OFFSET, &probe.offset.z, ScreenHandler.HandleZoffsetChange<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
+  VPHELPER(VP_STATIC_Z_OFFSET, &probe.settings.static_z_offset, ScreenHandler.HandleZoffsetChange<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
 #elif ENABLED(BABYSTEPPING)
   VPHELPER(VP_Z_OFFSET, nullptr, ScreenHandler.HandleZoffsetChange<2>, ScreenHandler.DGUSLCD_SendZOffsetToDisplay<2>),
 #endif

@@ -324,7 +324,7 @@
  *        D576 - Set buffer monitoring options. (Requires BUFFER_MONITORING)
  *
  * "C" codes (Creality CR-6)
- * C001 - Configure probe heater settings
+ * C001 - Configure probe settings
  * C100 - Reset DGUS display or navigate to screen (R or P)
  *
  *** "T" Codes ***

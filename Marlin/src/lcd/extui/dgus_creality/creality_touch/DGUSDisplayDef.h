@@ -94,7 +94,7 @@ enum DGUSLCD_Screens : uint8_t {
 
 // Version checks
 constexpr uint16_t VP_UI_VERSION_MAJOR = 0xFFFA;
-constexpr uint16_t EXPECTED_UI_VERSION_MAJOR = 62;
+constexpr uint16_t EXPECTED_UI_VERSION_MAJOR = 621;
 constexpr uint16_t VERSION_MISMATCH_BUZZ_AMOUNT = 5;
 constexpr uint16_t VERSION_MISMATCH_LED_FLASH_DELAY = 1000;
 
@@ -255,6 +255,7 @@ constexpr uint16_t ICON_REMAINING_VISIBLE = 26;
 constexpr uint16_t ICON_REMAINING_HIDDEN = 27;
 
 constexpr uint16_t VP_Z_OFFSET = 0x1026;
+constexpr uint16_t VP_STATIC_Z_OFFSET = 0x1028;
 
 // // SDCard File Listing
 constexpr uint16_t VP_SD_ScrollEvent = 0x20D4; // Data: 0 for "up a directory", numbers are the amount to scroll, e.g -1 one up, 1 one down

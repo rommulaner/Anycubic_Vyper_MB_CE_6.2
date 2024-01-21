@@ -3478,6 +3478,7 @@ void MarlinSettings::reset() {
       probe.settings.preheat_bed_temp = PROBING_BED_TEMP;
     #endif
 
+    probe.settings.static_z_offset = 0;
     probe.settings.stabilize_temperatures_after_probing = false;
   #endif
 
@@ -3841,6 +3842,7 @@ void MarlinSettings::reset() {
       SERIAL_ECHOPGM("  C001 S", probe.settings.turn_heaters_off ? 1 : 0);
       SERIAL_ECHOPGM(" H", probe.settings.preheat_hotend_temp);
       SERIAL_ECHOPGM(" B", probe.settings.preheat_bed_temp);
+      SERIAL_ECHOPGM(" Z", probe.settings.static_z_offset);
       SERIAL_ECHOLNPGM(" W", probe.settings.stabilize_temperatures_after_probing);
     #endif
   }

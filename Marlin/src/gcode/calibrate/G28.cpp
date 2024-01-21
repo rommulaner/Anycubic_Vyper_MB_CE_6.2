@@ -512,7 +512,7 @@ void GcodeSuite::G28() {
             #if ENABLED(DGUS_LCD_UI_CREALITY_TOUCH)
               float z_offset_backup;
               z_offset_backup = probe.offset.z;
-              ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(probe.offset.z, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);
+              ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(probe.settings.static_z_offset + probe.offset.z, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);   //apply static z-offset to get nozzle to bed height + normal z-offset
               probe.offset.z = z_offset_backup;
             #endif
 

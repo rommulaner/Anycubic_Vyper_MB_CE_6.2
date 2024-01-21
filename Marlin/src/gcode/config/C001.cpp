@@ -9,6 +9,7 @@ void GcodeSuite::C001() {
     if (parser.seenval('S')) probe.settings.turn_heaters_off = parser.value_bool();
     if (parser.seenval('H')) probe.settings.preheat_hotend_temp = parser.value_ushort();
     if (parser.seenval('B')) probe.settings.preheat_bed_temp = parser.value_ushort();
+    if (parser.seenval('Z')) probe.settings.static_z_offset = parser.value_float();
     if (parser.seenval('W')) probe.settings.stabilize_temperatures_after_probing = parser.value_bool();
 }
 #endif
