@@ -85,6 +85,9 @@ void GcodeSuite::G30() {
         );
         ui.set_status(msg);
       #endif
+      #if ENABLED(DGUS_LCD_UI_CREALITY_TOUCH)
+        probe.settings.static_z_offset = measured_z;
+      #endif
     }
 
     restore_feedrate_and_scaling();

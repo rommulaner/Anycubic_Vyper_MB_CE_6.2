@@ -88,11 +88,16 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
         case VP_BUTTON_BEDLEVELKEY:
             switch (buttonValue) {
                 case 1:
+                    probe.settings.static_z_offset = 0;                 //reset statis z-offset otherwise probing is faulty
+                    probe.offset.z = 0;                                 //reset z-offset otherwise probing is faulty
                     queue.enqueue_now_P("G28 U0");                      //home all axis
-                    queue.enqueue_now_P("G0 Z5 F240");                  //raise z
-                    sprintf(Buffer, "G0 X%d Y%d F4800", X_CENTER, Y_CENTER);  
-                    queue.enqueue_now_P(Buffer);                        //move nozzle to mid of bed in x an y
-                    queue.enqueue_now_P("G1 Z0 F120");                  //lower nozzle to bed for adjusting z-offset
+                    #if DISABLED (VYPER_NOZZLE_HOMING)
+                        queue.enqueue_now_P("G0 Z5 F240");              //raise z
+                        sprintf(Buffer, "G0 X%d Y%d F4800", X_CENTER, Y_CENTER);  
+                        queue.enqueue_now_P(Buffer);                    //move nozzle to mid of bed in x an y
+                        //queue.enqueue_now_P("G1 Z0 F120");            //lower nozzle to bed for adjusting z-offset
+                        queue.enqueue_now_P("G30");                     //probe bed with nozzle to get static z-offset
+                    #endif
                 break;
 
                 case 2:
@@ -116,11 +121,15 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
                 case 4:
                     if (all_axes_trusted()) {
                         // Increase static Z-offset
-                        float z_offset_backup;
-                        z_offset_backup = probe.offset.z;
-                        ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(0.05, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
-                        probe.settings.static_z_offset = probe.settings.static_z_offset + 0.05;
-                        probe.offset.z = z_offset_backup;
+                        #if DISABLED (VYPER_NOZZLE_HOMING)
+                            float z_offset_backup;
+                            z_offset_backup = probe.offset.z;
+                            ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(0.01, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
+                            probe.settings.static_z_offset = probe.settings.static_z_offset + 0.01;
+                            probe.offset.z = z_offset_backup;
+                        #else
+                            probe.settings.static_z_offset = 0;     //reset static z-offset in case its not 0, because its not needed at VYPER_NOOZLE_HOMING
+                        #endif 
                         ScreenHandler.ForceCompleteUpdate();
                         ScreenHandler.RequestSaveSettings();
                     }
@@ -129,11 +138,15 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
                 case 5:
                     if (all_axes_trusted()) {
                         // Decrease static Z-offset
-                        float z_offset_backup;
-                        z_offset_backup = probe.offset.z;
-                        ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(-0.05, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
-                        probe.settings.static_z_offset = probe.settings.static_z_offset - 0.05;
-                        probe.offset.z = z_offset_backup;
+                        #if DISABLED (VYPER_NOZZLE_HOMING)
+                            float z_offset_backup;
+                            z_offset_backup = probe.offset.z;
+                            ExtUI::smartAdjustAxis_steps(ExtUI::mmToWholeSteps(-0.01, ExtUI::axis_t::Z), ExtUI::axis_t::Z, true);;
+                            probe.settings.static_z_offset = probe.settings.static_z_offset - 0.01;
+                            probe.offset.z = z_offset_backup;
+                        #else
+                            probe.settings.static_z_offset = 0;     //reset static z-offset in case its not 0, because its not needed at VYPER_NOOZLE_HOMING
+                        #endif
                         ScreenHandler.ForceCompleteUpdate();
                         ScreenHandler.RequestSaveSettings();
                     }    
@@ -167,8 +180,8 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
             #if ENABLED(Z_STEPPER_AUTO_ALIGN) && DISABLED(Z_MULTI_ENDSTOPS)
                 ExtUI::injectCommands_P("G28 U0\nG34\nG29 U0");
             #else
-                probe.offset.z = 0;                                  //zero Z-offset
-                ExtUI::injectCommands_P("G28 U0\nG29 U0");  //home all axis, start bed leveling, U0 is for probe heaters function
+                probe.offset.z = 0;                                 //reset z-offset, otherwise bedleveling is faulty
+                ExtUI::injectCommands_P("G28 U0\nG29 U0");          //home all axis, start bed leveling, U0 is for probe heaters function
             #endif
 #if HAS_MESH
             ScreenHandler.ResetMeshValues();

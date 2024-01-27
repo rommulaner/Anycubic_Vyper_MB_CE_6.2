@@ -71,6 +71,8 @@
 
 #define GRID_MAX_POINTS_X 4   // moved here for easier change of the bed leveling mesh size
 
+//#define ALL_METAL_HOTEND      // if all metal hotend installed hotend max temp is raisded from 260 to 300
+
 // Leave undefined to home Z using two Z sensors (stock configuration)
 //#define VYPER_NOZZLE_HOMING // home Z using nozzle sensor at middle of bed
 
@@ -653,17 +655,28 @@
 // Above this temperature the heater will be switched off.
 // This can protect components from overheating, but NOT from shorts and failures.
 // (Use MINTEMP for thermistor short/failure protection.)
-#define HEATER_0_MAXTEMP 275 //275 original
-#define HEATER_1_MAXTEMP 275 //275 original
-#define HEATER_2_MAXTEMP 275 //275 original
-#define HEATER_3_MAXTEMP 275 //275 original
-#define HEATER_4_MAXTEMP 275 //275 original
-#define HEATER_5_MAXTEMP 275 //275 original
-#define HEATER_6_MAXTEMP 275 //275 original
-#define HEATER_7_MAXTEMP 275 //275 original
-#define BED_MAXTEMP      120
-#define CHAMBER_MAXTEMP  60
 
+#if ENABLED(ALL_METAL_HOTEND)
+  #define HEATER_0_MAXTEMP 315    //max temp is 300 (MAXTEMP - OVERSHOOT)
+  #define HEATER_1_MAXTEMP 315
+  #define HEATER_2_MAXTEMP 315
+  #define HEATER_3_MAXTEMP 315
+  #define HEATER_4_MAXTEMP 315
+  #define HEATER_5_MAXTEMP 315
+  #define HEATER_6_MAXTEMP 315
+  #define HEATER_7_MAXTEMP 315
+#else
+  #define HEATER_0_MAXTEMP 275    //max temp is 260 (MAXTEMP - OVERSHOOT)
+  #define HEATER_1_MAXTEMP 275
+  #define HEATER_2_MAXTEMP 275
+  #define HEATER_3_MAXTEMP 275
+  #define HEATER_4_MAXTEMP 275
+  #define HEATER_5_MAXTEMP 275
+  #define HEATER_6_MAXTEMP 275
+  #define HEATER_7_MAXTEMP 275
+#endif
+#define BED_MAXTEMP      120    //max temp is 110 (MAXTEMP - OVERSHOOT)
+#define CHAMBER_MAXTEMP  60
 /**
  * Thermal Overshoot
  * During heatup (and printing) the temperature can often "overshoot" the target by many degrees
@@ -1215,7 +1228,7 @@
  * Override with M203
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_FEEDRATE          { 200, 200, 16, 80 }
+#define DEFAULT_MAX_FEEDRATE          { 200, 200, 16, 60 }
 
 //#define LIMITED_MAX_FR_EDITING        // Limit edit via M203 or LCD to DEFAULT_MAX_FEEDRATE * 2
 #if ENABLED(LIMITED_MAX_FR_EDITING)
@@ -1228,7 +1241,7 @@
  * Override with M201
  *                                      X, Y, Z [, I [, J [, K...]]], E0 [, E1[, E2...]]
  */
-#define DEFAULT_MAX_ACCELERATION      { 5000, 4000, 1000, 5000 }
+#define DEFAULT_MAX_ACCELERATION      { 5000, 3500, 1000, 3000 }
 
 //#define LIMITED_MAX_ACCEL_EDITING     // Limit edit via M201 or LCD to DEFAULT_MAX_ACCELERATION * 2
 #if ENABLED(LIMITED_MAX_ACCEL_EDITING)
@@ -1244,7 +1257,7 @@
  *   M204 T    Travel Acceleration
  */
 #define DEFAULT_ACCELERATION          3000    // X, Y, Z and E acceleration for printing moves
-#define DEFAULT_RETRACT_ACCELERATION  3000    // E acceleration for retracts
+#define DEFAULT_RETRACT_ACCELERATION  2000    // E acceleration for retracts
 #define DEFAULT_TRAVEL_ACCELERATION   5000    // X, Y, Z acceleration for travel (non printing) moves
 
 /**
@@ -1537,13 +1550,13 @@
 #define PROBING_MARGIN 10
 
 // X and Y axis travel speed (mm/min) between probes
-#define XY_PROBE_FEEDRATE (100*60)
+#define XY_PROBE_FEEDRATE (80*60)
 
 // Feedrate (mm/min) for the first approach when double-probing (MULTIPLE_PROBING == 2)
-#define Z_PROBE_FEEDRATE_FAST (60)
+#define Z_PROBE_FEEDRATE_FAST (1*60)
 
 // Feedrate (mm/min) for the "accurate" probe of each point
-#define Z_PROBE_FEEDRATE_SLOW (Z_PROBE_FEEDRATE_FAST / 2)
+#define Z_PROBE_FEEDRATE_SLOW (Z_PROBE_FEEDRATE_FAST)
 
 /**
  * Probe Activation Switch
@@ -1567,7 +1580,7 @@
 #define PROBE_TARE
 #if ENABLED(PROBE_TARE)
   #define PROBE_TARE_TIME  300    // (ms) Time to hold tare pin
-  #define PROBE_TARE_DELAY 300    // (ms) Delay after tare before
+  #define PROBE_TARE_DELAY 200    // (ms) Delay after tare before
   #define PROBE_TARE_STATE LOW   // State to write pin for tare
   //#define PROBE_TARE_PIN PA5    // Override default pin
   #if ENABLED(PROBE_ACTIVATION_SWITCH)
@@ -1611,7 +1624,7 @@
  *     But: `M851 Z+1` with a CLEARANCE of 2  =>  2mm from bed to nozzle.
  */
 #define Z_CLEARANCE_DEPLOY_PROBE    5 // Z Clearance for Deploy/Stow
-#define Z_CLEARANCE_BETWEEN_PROBES  5 // Z Clearance between probe points
+#define Z_CLEARANCE_BETWEEN_PROBES  2 // Z Clearance between probe points
 #define Z_CLEARANCE_MULTI_PROBE     2 // Z Clearance between multiple probes
 //#define Z_AFTER_PROBING           5 // Z position after probing is done
 
@@ -1650,12 +1663,12 @@
 #define PROBING_FANS_OFF          // Turn fans off when probing
 #define PROBING_ESTEPPERS_OFF     // Turn all extruder steppers off when probing
 //#define PROBING_STEPPERS_OFF      // Turn all steppers off (unless needed to hold position) when probing (including extruders)
-#define DELAY_BEFORE_PROBING 300  // (ms) To prevent vibrations from triggering piezo sensors
+#define DELAY_BEFORE_PROBING 250  // (ms) To prevent vibrations from triggering piezo sensors
 
 // Require minimum nozzle and/or bed temperature for probing
 #define PREHEAT_BEFORE_PROBING
 #if ENABLED(PREHEAT_BEFORE_PROBING)
-  #define PROBING_NOZZLE_TEMP 170   // (°C) Only applies to E0 at this time
+  #define PROBING_NOZZLE_TEMP 140   // (°C) Only applies to E0 at this time
   #define PROBING_BED_TEMP     60
 #endif
 
