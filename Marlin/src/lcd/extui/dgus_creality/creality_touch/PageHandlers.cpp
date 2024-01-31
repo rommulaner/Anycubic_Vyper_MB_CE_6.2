@@ -95,7 +95,6 @@ void LevelingModeHandler(DGUS_VP_Variable &var, unsigned short buttonValue) {
                         queue.enqueue_now_P("G0 Z5 F240");              //raise z
                         sprintf(Buffer, "G0 X%d Y%d F4800", X_CENTER, Y_CENTER);  
                         queue.enqueue_now_P(Buffer);                    //move nozzle to mid of bed in x an y
-                        //queue.enqueue_now_P("G1 Z0 F120");            //lower nozzle to bed for adjusting z-offset
                         queue.enqueue_now_P("G30");                     //probe bed with nozzle to get static z-offset
                     #endif
                 break;

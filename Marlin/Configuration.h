@@ -1631,12 +1631,12 @@
 #if ENABLED(VYPER_NOZZLE_HOMING)
   #define Z_PROBE_LOW_POINT        -3 // Farthest distance below the trigger-point to go before stopping
 #else
-  #define Z_PROBE_LOW_POINT        -3 // (mm) Farthest distance below the trigger-point to go before stopping
+  #define Z_PROBE_LOW_POINT        -6 // (mm) Farthest distance below the trigger-point to go before stopping
 #endif
 
 // For M851 give a range for adjusting the Z probe offset
-#define Z_PROBE_OFFSET_RANGE_MIN -5
-#define Z_PROBE_OFFSET_RANGE_MAX  5
+#define Z_PROBE_OFFSET_RANGE_MIN -10
+#define Z_PROBE_OFFSET_RANGE_MAX  10
 
 // Enable the M48 repeatability test to test probe accuracy
 #define Z_MIN_PROBE_REPEATABILITY_TEST

@@ -30,6 +30,10 @@
 #include "../../feature/bedlevel/bedlevel.h"
 #include "../../lcd/marlinui.h"
 
+#if ENABLED(EXTENSIBLE_UI)
+  #include "../../lcd/extui/ui_api.h"
+#endif
+
 #if HAS_PTC
   #include "../../feature/probe_temp_comp.h"
 #endif
@@ -53,6 +57,10 @@ void GcodeSuite::G30() {
   #if HAS_MULTI_HOTEND
     const uint8_t old_tool_index = active_extruder;
     tool_change(0);
+  #endif
+
+  #if ENABLED (DGUS_LCD_UI_CREALITY_TOUCH)
+    TERN_(EXTENSIBLE_UI, ExtUI::onHomingStart());
   #endif
 
   // Convert the given logical position to native position
@@ -87,6 +95,7 @@ void GcodeSuite::G30() {
       #endif
       #if ENABLED(DGUS_LCD_UI_CREALITY_TOUCH)
         probe.settings.static_z_offset = measured_z;
+        TERN_(EXTENSIBLE_UI, ExtUI::onHomingDone());
       #endif
     }
 
