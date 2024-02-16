@@ -3468,7 +3468,7 @@ void MarlinSettings::reset() {
   TERN_(DGUS_LCD_UI_MKS, MKS_reset_settings());
 
   #if HAS_PROBE_SETTINGS
-    probe.settings.turn_heaters_off = false;
+    probe.settings.turn_heaters_off = true;
 
     #if PROBING_NOZZLE_TEMP
       probe.settings.preheat_hotend_temp = PROBING_NOZZLE_TEMP;

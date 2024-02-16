@@ -125,7 +125,7 @@
                            || AXIS_DRIVER_TYPE(A,TMC2660) \
                            || AXIS_DRIVER_TYPE(A,TMC5130) || AXIS_DRIVER_TYPE(A,TMC5160) )
 
-#define AXIS_IS_TMC_CONFIG(A)   ( AXIS_IS_TMC(A) || AXIS_DRIVER_TYPE(A,TMC26X) )
+//#define AXIS_IS_TMC_CONFIG(A)   ( AXIS_IS_TMC(A) || AXIS_DRIVER_TYPE(A,TMC26X) )
 
 // Test for a driver that uses SPI - this allows checking whether a _CS_ pin
 // is considered sensitive

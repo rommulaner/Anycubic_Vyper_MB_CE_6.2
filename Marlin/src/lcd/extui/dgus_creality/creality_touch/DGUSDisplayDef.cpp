@@ -34,7 +34,10 @@
 #include "FilamentLoadUnloadHandler.h"
 #include "PIDHandler.h"
 #include "MeshValidationHandler.h"
-#include "InputShapingHandler.h"
+
+#if EITHER(INPUT_SHAPING_X, INPUT_SHAPING_Y)
+  #include "InputShapingHandler.h"
+#endif
 
 #include "../../../../module/temperature.h"
 #include "../../../../module/motion.h"
@@ -551,12 +554,14 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   VPHELPER(VP_GENERIC_BACK_BUTTON, nullptr, ScreenHandler.OnBackButton, nullptr),
 
 // ... Input Shaping
+#if EITHER(INPUT_SHAPING_X, INPUT_SHAPING_Y)
   VPHELPER(VP_INPUT_SHAPING_NAV_BUTTON, nullptr, (ScreenHandler.DGUSLCD_NavigateToPage<DGUSLCD_SCREEN_INPUT_SHAPING, InputShapingHandler>), nullptr),
   VPHELPER(VP_INPUT_SHAPING_FREQ_X, &InputShapingHandler::set_freq_x, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
   VPHELPER(VP_INPUT_SHAPING_ZETA_X, &InputShapingHandler::set_zeta_x, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
   VPHELPER(VP_INPUT_SHAPING_FREQ_Y, &InputShapingHandler::set_freq_y, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
   VPHELPER(VP_INPUT_SHAPING_ZETA_Y, &InputShapingHandler::set_zeta_y, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
   VPHELPER(VP_INPUT_SHAPING_BACK_BUTTON, nullptr, InputShapingHandler::HandleInputShapingBackButton, nullptr),
+#endif
 
 #if HAS_MESH
   // ... Mesh validation

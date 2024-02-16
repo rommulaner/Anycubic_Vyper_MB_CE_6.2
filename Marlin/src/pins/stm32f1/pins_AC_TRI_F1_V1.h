@@ -123,8 +123,7 @@
 // Misc
 //
 #define LED_CONTROL_PIN                     PA13
-//#define BEEPER_PIN                          PB15    // used for beeps using on board beeper
-#define BEEPER_PIN                            PB15    // used for start up tunes using on board beeper
+#define BEEPER_PIN                          PB15    // used for beeps using on board beeper
 //#define LED_PIN                             PA8
 //#define POWER_LOSS_PIN                      PA6     // logic level detection
 #define FIL_RUNOUT_PIN                      PA5

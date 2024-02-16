@@ -615,7 +615,7 @@
     #ifdef __AVR__
       #define FAST_PWM_FAN_FREQUENCY ((F_CPU) / (2 * 255 * 1))
     #else
-      #define FAST_PWM_FAN_FREQUENCY 1000U
+      #define FAST_PWM_FAN_FREQUENCY 100
     #endif
   #endif
 #endif
@@ -2726,8 +2726,8 @@
    */
   #define INTERPOLATE      true
 
-  #if AXIS_IS_TMC_CONFIG(X)
-    #define X_CURRENT       800        // (mA) RMS current. Multiply by 1.414 for peak current.
+  #if AXIS_IS_TMC(X)
+    #define X_CURRENT       550        // (mA) RMS current. Multiply by 1.414 for peak current.
     #define X_CURRENT_HOME  X_CURRENT  // (mA) RMS current for sensorless homing
     #define X_MICROSTEPS     16        // 0..256
     #define X_RSENSE          0.11     // Multiplied x1000 for TMC26X
@@ -2736,7 +2736,7 @@
     //#define X_HOLD_MULTIPLIER 0.5    // Enable to override 'HOLD_MULTIPLIER' for the X axis
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(X2)
+  #if AXIS_IS_TMC(X2)
     #define X2_CURRENT      800
     #define X2_CURRENT_HOME X2_CURRENT
     #define X2_MICROSTEPS    X_MICROSTEPS
@@ -2746,8 +2746,8 @@
     //#define X2_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(Y)
-    #define Y_CURRENT       800
+  #if AXIS_IS_TMC(Y)
+    #define Y_CURRENT       600
     #define Y_CURRENT_HOME  Y_CURRENT
     #define Y_MICROSTEPS     16
     #define Y_RSENSE          0.11
@@ -2756,7 +2756,7 @@
     //#define Y_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(Y2)
+  #if AXIS_IS_TMC(Y2)
     #define Y2_CURRENT      800
     #define Y2_CURRENT_HOME Y2_CURRENT
     #define Y2_MICROSTEPS    Y_MICROSTEPS
@@ -2766,8 +2766,8 @@
     //#define Y2_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(Z)
-    #define Z_CURRENT       800
+  #if AXIS_IS_TMC(Z)
+    #define Z_CURRENT       650
     #define Z_CURRENT_HOME  Z_CURRENT
     #define Z_MICROSTEPS     16
     #define Z_RSENSE          0.11
@@ -2776,8 +2776,8 @@
     //#define Z_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(Z2)
-    #define Z2_CURRENT      800
+  #if AXIS_IS_TMC(Z2)
+    #define Z2_CURRENT      Z_CURRENT
     #define Z2_CURRENT_HOME Z2_CURRENT
     #define Z2_MICROSTEPS    Z_MICROSTEPS
     #define Z2_RSENSE         0.11
@@ -2786,7 +2786,7 @@
     //#define Z2_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(Z3)
+  #if AXIS_IS_TMC(Z3)
     #define Z3_CURRENT      800
     #define Z3_CURRENT_HOME Z3_CURRENT
     #define Z3_MICROSTEPS    Z_MICROSTEPS
@@ -2796,7 +2796,7 @@
     //#define Z3_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(Z4)
+  #if AXIS_IS_TMC(Z4)
     #define Z4_CURRENT      800
     #define Z4_CURRENT_HOME Z4_CURRENT
     #define Z4_MICROSTEPS    Z_MICROSTEPS
@@ -2806,7 +2806,7 @@
     //#define Z4_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(I)
+  #if AXIS_IS_TMC(I)
     #define I_CURRENT      800
     #define I_CURRENT_HOME I_CURRENT
     #define I_MICROSTEPS    16
@@ -2816,7 +2816,7 @@
     //#define I_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(J)
+  #if AXIS_IS_TMC(J)
     #define J_CURRENT      800
     #define J_CURRENT_HOME J_CURRENT
     #define J_MICROSTEPS    16
@@ -2826,7 +2826,7 @@
     //#define J_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(K)
+  #if AXIS_IS_TMC(K)
     #define K_CURRENT      800
     #define K_CURRENT_HOME K_CURRENT
     #define K_MICROSTEPS    16
@@ -2836,7 +2836,7 @@
     //#define K_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(U)
+  #if AXIS_IS_TMC(U)
     #define U_CURRENT      800
     #define U_CURRENT_HOME U_CURRENT
     #define U_MICROSTEPS     8
@@ -2846,7 +2846,7 @@
     //#define U_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(V)
+  #if AXIS_IS_TMC(V)
     #define V_CURRENT      800
     #define V_CURRENT_HOME V_CURRENT
     #define V_MICROSTEPS     8
@@ -2856,7 +2856,7 @@
     //#define V_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(W)
+  #if AXIS_IS_TMC(W)
     #define W_CURRENT      800
     #define W_CURRENT_HOME W_CURRENT
     #define W_MICROSTEPS     8
@@ -2866,8 +2866,8 @@
     //#define W_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(E0)
-    #define E0_CURRENT      800
+  #if AXIS_IS_TMC(E0)
+    #define E0_CURRENT      600
     #define E0_MICROSTEPS    16
     #define E0_RSENSE         0.11
     #define E0_CHAIN_POS     -1
@@ -2875,7 +2875,7 @@
     //#define E0_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(E1)
+  #if AXIS_IS_TMC(E1)
     #define E1_CURRENT      800
     #define E1_MICROSTEPS   E0_MICROSTEPS
     #define E1_RSENSE         0.11
@@ -2884,7 +2884,7 @@
     //#define E1_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(E2)
+  #if AXIS_IS_TMC(E2)
     #define E2_CURRENT      800
     #define E2_MICROSTEPS   E0_MICROSTEPS
     #define E2_RSENSE         0.11
@@ -2893,7 +2893,7 @@
     //#define E2_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(E3)
+  #if AXIS_IS_TMC(E3)
     #define E3_CURRENT      800
     #define E3_MICROSTEPS   E0_MICROSTEPS
     #define E3_RSENSE         0.11
@@ -2902,7 +2902,7 @@
     //#define E3_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(E4)
+  #if AXIS_IS_TMC(E4)
     #define E4_CURRENT      800
     #define E4_MICROSTEPS   E0_MICROSTEPS
     #define E4_RSENSE         0.11
@@ -2911,7 +2911,7 @@
     //#define E4_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(E5)
+  #if AXIS_IS_TMC(E5)
     #define E5_CURRENT      800
     #define E5_MICROSTEPS   E0_MICROSTEPS
     #define E5_RSENSE         0.11
@@ -2920,7 +2920,7 @@
     //#define E5_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(E6)
+  #if AXIS_IS_TMC(E6)
     #define E6_CURRENT      800
     #define E6_MICROSTEPS   E0_MICROSTEPS
     #define E6_RSENSE         0.11
@@ -2929,7 +2929,7 @@
     //#define E6_HOLD_MULTIPLIER 0.5
   #endif
 
-  #if AXIS_IS_TMC_CONFIG(E7)
+  #if AXIS_IS_TMC(E7)
     #define E7_CURRENT      800
     #define E7_MICROSTEPS   E0_MICROSTEPS
     #define E7_RSENSE         0.11
@@ -3058,7 +3058,7 @@
    * Define your own with:
    * { <off_time[1..15]>, <hysteresis_end[-3..12]>, hysteresis_start[1..8] }
    */
-  #define CHOPPER_TIMING CHOPPER_DEFAULT_12V        // All axes (override below)
+  #define CHOPPER_TIMING CHOPPER_DEFAULT_24V        // All axes (override below)
   //#define CHOPPER_TIMING_X  CHOPPER_TIMING        // For X Axes (override below)
   //#define CHOPPER_TIMING_X2 CHOPPER_TIMING_X
   //#define CHOPPER_TIMING_Y  CHOPPER_TIMING        // For Y Axes (override below)
@@ -3095,7 +3095,7 @@
    * M912 - Clear stepper driver overtemperature pre-warn condition flag.
    * M122 - Report driver parameters (Requires TMC_DEBUG)
    */
-  //#define MONITOR_DRIVER_STATUS
+  #define MONITOR_DRIVER_STATUS
 
   #if ENABLED(MONITOR_DRIVER_STATUS)
     #define CURRENT_STEP_DOWN     50  // [mA]
@@ -3112,14 +3112,14 @@
    * STEALTHCHOP_(XY|Z|E) must be enabled to use HYBRID_THRESHOLD.
    * M913 X/Y/Z/E to live tune the setting
    */
-  //#define HYBRID_THRESHOLD
+  #define HYBRID_THRESHOLD
 
-  #define X_HYBRID_THRESHOLD     100  // [mm/s]
-  #define X2_HYBRID_THRESHOLD    100
-  #define Y_HYBRID_THRESHOLD     100
-  #define Y2_HYBRID_THRESHOLD    100
-  #define Z_HYBRID_THRESHOLD       3
-  #define Z2_HYBRID_THRESHOLD      3
+  #define X_HYBRID_THRESHOLD     150  // [mm/s]
+  #define X2_HYBRID_THRESHOLD    150
+  #define Y_HYBRID_THRESHOLD     150
+  #define Y2_HYBRID_THRESHOLD    150
+  #define Z_HYBRID_THRESHOLD      10
+  #define Z2_HYBRID_THRESHOLD     10
   #define Z3_HYBRID_THRESHOLD      3
   #define Z4_HYBRID_THRESHOLD      3
   #define I_HYBRID_THRESHOLD       3  // [linear=mm/s, rotational=°/s]
@@ -3128,7 +3128,7 @@
   #define U_HYBRID_THRESHOLD       3  // [mm/s]
   #define V_HYBRID_THRESHOLD       3
   #define W_HYBRID_THRESHOLD       3
-  #define E0_HYBRID_THRESHOLD     30
+  #define E0_HYBRID_THRESHOLD     50
   #define E1_HYBRID_THRESHOLD     30
   #define E2_HYBRID_THRESHOLD     30
   #define E3_HYBRID_THRESHOLD     30
@@ -3167,9 +3167,9 @@
 
   #if EITHER(SENSORLESS_HOMING, SENSORLESS_PROBING)
     // TMC2209: 0...255. TMC2130: -64...63
-    #define X_STALL_SENSITIVITY  8
+    #define X_STALL_SENSITIVITY  71
     #define X2_STALL_SENSITIVITY X_STALL_SENSITIVITY
-    #define Y_STALL_SENSITIVITY  8
+    #define Y_STALL_SENSITIVITY  85
     #define Y2_STALL_SENSITIVITY Y_STALL_SENSITIVITY
     //#define Z_STALL_SENSITIVITY  8
     //#define Z2_STALL_SENSITIVITY Z_STALL_SENSITIVITY

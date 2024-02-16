@@ -110,7 +110,8 @@
 
 // Choose the name from boards.h that matches your setup
 #ifndef MOTHERBOARD
-  #define MOTHERBOARD BOARD_TRIGORILLA_V006
+  //#define MOTHERBOARD BOARD_TRIGORILLA_V006   //switched back to AC_TRI_F1_V1 because of loud PWM noise of part cooling fan
+  #define MOTHERBOARD BOARD_AC_TRI_F1_V1
 #endif
 
 /**
@@ -1991,7 +1992,7 @@
    */
   #define ENABLE_LEVELING_FADE_HEIGHT
   #if ENABLED(ENABLE_LEVELING_FADE_HEIGHT)
-    #define DEFAULT_LEVELING_FADE_HEIGHT 0.0 // (mm) Default fade height.
+    #define DEFAULT_LEVELING_FADE_HEIGHT 10.0 // (mm) Default fade height.
   #endif
 
   /**
