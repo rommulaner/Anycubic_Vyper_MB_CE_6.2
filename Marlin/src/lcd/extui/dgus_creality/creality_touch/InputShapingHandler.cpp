@@ -22,7 +22,7 @@
         void InputShapingHandler::Init() {
             // get settings
             set_freq_x = stepper.get_shaping_frequency(X_AXIS);
-            set_zeta_x = stepper.get_shaping_damping_ratio(Y_AXIS);
+            set_zeta_x = stepper.get_shaping_damping_ratio(X_AXIS);
             set_freq_y = stepper.get_shaping_frequency(Y_AXIS);
             set_zeta_y = stepper.get_shaping_damping_ratio(Y_AXIS);
 
