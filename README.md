@@ -61,7 +61,6 @@ There are advantages and disadvantages to using the nozzle as Z home position, t
 Initially started with the goal of providing an alternative firmware for the Anycubic Vyper motherboard
 
 - Providing better firmware than the default firmwares provided by Anycubic
-- [Expanding the features](https://github.com/Pmatsol58/CR-6-touchscreen/tree/v2.0.8.1-vyper-community-release-6.1) of the limited default touch screens delivered with 3d printers
 
 Once upstream Marlin supports the strain gauge, [currently being whipped into shape in this PR @Sebazzz has submitted](https://github.com/MarlinFirmware/Marlin/pull/19958), the future of this project will probably be:
 
@@ -77,17 +76,6 @@ Get in touch with the developers! We [have our own Discord server](https://disco
 ### Anycubic Vyper Community
 
 - [Facebook](https://www.facebook.com/groups/anycubicvyper)
-
-### Creality CR-6 communities
-The following CR-6 communities exist:
-
-- [Facebook independend CR-6 community](https://www.facebook.com/groups/cr6community)
-- [Reddit /r/CR6](https://www.reddit.com/r/CR6/)
-
-Communities hosted by Creality:
-
-- [Official CR-6 user group](https://www.facebook.com/groups/CR6SECR6MAX)
-- [Official Creality user group](https://www.facebook.com/groups/creality3dofficial)
 
 ### Other communities:
 
@@ -111,17 +99,6 @@ For general Marlin support, please check:
 - Follow the [coding standards](https://marlinfw.org/docs/development/coding_standards.html)
 - Please submit your questions and concerns in the [issue tracker](https://github.com/MarlinFirmware/Marlin/issues)
 
-## Credits
-
-The current core Community firmware dev team consists of:
-
- - Sebastiaan Dammann [[@Sebazzz](https://github.com/Sebazzz)] - Netherlands &nbsp; ([Donate](https://www.paypal.com/donate?hosted_button_id=YCH72S6WZQ5X4) ([Profile](https://www.paypal.com/paypalme/sebastiaandammann)) | [Website](https://damsteen.nl))
- - Juan Rodriguez [[@Nushio](https://github.com/Nushio)] - Mexico
- - Romain [[@grobux](https://github.com/grobux)] - France ([Donate](https://www.paypal.com/donate?hosted_button_id=CP2SAW4W9RBT4))
- - Nick Acker [[@nickacker](https://github.com/nickacker)] - USA
- - And more...
-
-We stand on the shoulders of giants. Don't forget to send your love [upstream too](https://github.com/MarlinFirmware/Marlin)!
 
 ## License
 
