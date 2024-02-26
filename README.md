@@ -70,7 +70,7 @@ Once upstream Marlin supports the strain gauge, [currently being whipped into sh
 
 ## Community firmware support & communities
 
-Get in touch with the developers! We [have our own Discord server](https://discord.gg/RKrxYy3Q9N) and github.com/rommulaner
+Get in touch with the developer on github.com/rommulaner
 
 
 ### Anycubic Vyper Community
