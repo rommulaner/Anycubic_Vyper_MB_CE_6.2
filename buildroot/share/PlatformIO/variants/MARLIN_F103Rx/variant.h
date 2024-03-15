@@ -129,6 +129,7 @@ extern "C" {
   #define TIMER_TONE            TIM3  // TIMER_TONE must be defined in this file
 #endif
 #ifndef TIMER_SERVO
+  #undef TIMER_SERVO
   #define TIMER_SERVO           TIM2  // TIMER_SERVO must be defined in this file
 #endif
 
