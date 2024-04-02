@@ -30,14 +30,18 @@
         }
 
         void InputShapingHandler::HandleInputShapingBackButton(DGUS_VP_Variable &var, void *val_ptr) {
-            // save settings and return to old screen
+            // return to old screen
+            ScreenHandler.PopToOldScreen();
+        }
+
+        void InputShapingHandler::HandleInputShapingApplyButton(DGUS_VP_Variable &var, void *val_ptr) {
+            // apply and save settings
             stepper.set_shaping_frequency(X_AXIS, set_freq_x);
             stepper.set_shaping_damping_ratio(X_AXIS, set_zeta_x);
             stepper.set_shaping_frequency(Y_AXIS,set_freq_y);
             stepper.set_shaping_damping_ratio(Y_AXIS,set_zeta_y);
 
             settings.save();
-            ScreenHandler.PopToOldScreen();
 
             SetStatusMessage(PSTR("New values saved"));
         }

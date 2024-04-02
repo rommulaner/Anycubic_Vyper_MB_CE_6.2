@@ -561,6 +561,7 @@ const struct DGUS_VP_Variable ListOfVP[] PROGMEM = {
   VPHELPER(VP_INPUT_SHAPING_FREQ_Y, &InputShapingHandler::set_freq_y, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
   VPHELPER(VP_INPUT_SHAPING_ZETA_Y, &InputShapingHandler::set_zeta_y, ScreenHandler.DGUSLCD_SetFloatAsIntFromDisplay<2>, ScreenHandler.DGUSLCD_SendFloatAsIntValueToDisplay<2>),
   VPHELPER(VP_INPUT_SHAPING_BACK_BUTTON, nullptr, InputShapingHandler::HandleInputShapingBackButton, nullptr),
+  VPHELPER(VP_INPUT_SHAPING_APPLY_BUTTON, nullptr, InputShapingHandler::HandleInputShapingApplyButton, nullptr),
 #endif
 
 #if HAS_MESH

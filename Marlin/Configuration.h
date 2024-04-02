@@ -83,7 +83,7 @@
 // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 // Author info of this build printed to the host during boot and M115
-#define STRING_CONFIG_H_AUTHOR "(Rommulaner, Vyper CE-6.2.1 Marlin 2.1.2.1)" // Who made the changes.
+#define STRING_CONFIG_H_AUTHOR "(Rommulaner, Vyper CE-6.2.2 Marlin 2.1.2.1)" // Who made the changes.
 //#define CUSTOM_VERSION_FILE Version.h // Path from the root directory (no quotes)
 
 /**
@@ -160,7 +160,7 @@
 
 // Name displayed in the LCD "Ready" message and Info menu
 //#define CUSTOM_MACHINE_NAME "3D Printer"
-#define CUSTOM_MACHINE_NAME "Anycubic Vyper CE-6.2.1"
+#define CUSTOM_MACHINE_NAME "Anycubic Vyper CE-6.2.2"
 
 // Printer's unique ID, used by some programs to differentiate between machines.
 // Choose your own or use a service like https://www.uuidgenerator.net/version4
@@ -1176,6 +1176,7 @@
 #define W_MAX_ENDSTOP_INVERTING false // Set to true to invert the logic of the endstop.
 #define Z_MIN_PROBE_ENDSTOP_INVERTING true // Set to true to invert the logic of the probe.
 
+
 // Enable this feature if all enabled endstop pins are interrupt-capable.
 // This will remove the need to poll the interrupt pins, saving many CPU cycles.
 //#define ENDSTOP_INTERRUPTS_FEATURE
@@ -1393,6 +1394,11 @@
  * The BLTouch probe uses a Hall effect sensor and emulates a servo.
  */
 //#define BLTOUCH
+#ifdef BLTOUCH
+  #undef NOZZLE_AS_PROBE
+  #undef Z_MIN_PROBE_ENDSTOP_INVERTING
+  #define Z_MIN_PROBE_ENDSTOP_INVERTING false
+#endif
 
 /**
  * MagLev V4 probe by MDD
@@ -1578,7 +1584,9 @@
  * Useful for a strain gauge or piezo sensor that needs to factor out
  * elements such as cables pulling on the carriage.
  */
+#ifndef BLTOUCH
 #define PROBE_TARE
+#endif
 #if ENABLED(PROBE_TARE)
   #define PROBE_TARE_TIME  300    // (ms) Time to hold tare pin
   #define PROBE_TARE_DELAY 200    // (ms) Delay after tare before

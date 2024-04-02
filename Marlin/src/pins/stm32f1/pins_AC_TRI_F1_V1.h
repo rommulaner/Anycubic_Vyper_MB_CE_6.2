@@ -132,8 +132,15 @@
 #define MAIN_VOLTAGE_MEASURE_PIN            PA6
 #define AUTO_LEVEL_TX_PIN                   PB13
 #define AUTO_LEVEL_RX_PIN                   PB12
-#define PROBE_TARE_PIN                      AUTO_LEVEL_TX_PIN
-#define Z_MIN_PROBE_PIN                     AUTO_LEVEL_RX_PIN
+
+#ifndef BLTOUCH
+  #define PROBE_TARE_PIN                      AUTO_LEVEL_TX_PIN
+  #define Z_MIN_PROBE_PIN                     AUTO_LEVEL_RX_PIN
+#else
+  #define SERVO0_PIN                        AUTO_LEVEL_TX_PIN
+  #define Z_MIN_PROBE_PIN                   AUTO_LEVEL_RX_PIN
+#endif
+
 #define NEOPIXEL_PIN                        PB14    // neopixel LED driving pin
 #define PROBE_ACTIVATION_SWITCH_PIN         PB2
 

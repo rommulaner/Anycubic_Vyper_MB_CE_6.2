@@ -6,6 +6,7 @@ class InputShapingHandler {
     public:
         static void Init();
         static void HandleInputShapingBackButton(DGUS_VP_Variable &var, void *val_ptr);
+        static void HandleInputShapingApplyButton(DGUS_VP_Variable &var, void *val_ptr);
 
     public:
         static float set_freq_x;

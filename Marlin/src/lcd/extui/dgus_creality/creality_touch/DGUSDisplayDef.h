@@ -94,7 +94,7 @@ enum DGUSLCD_Screens : uint8_t {
 
 // Version checks
 constexpr uint16_t VP_UI_VERSION_MAJOR = 0xFFFA;
-constexpr uint16_t EXPECTED_UI_VERSION_MAJOR = 621;
+constexpr uint16_t EXPECTED_UI_VERSION_MAJOR = 622;
 constexpr uint16_t VERSION_MISMATCH_BUZZ_AMOUNT = 5;
 constexpr uint16_t VERSION_MISMATCH_LED_FLASH_DELAY = 1000;
 
@@ -464,6 +464,7 @@ constexpr uint16_t VP_INPUT_SHAPING_FREQ_Y = 0x2329;
 constexpr uint16_t VP_INPUT_SHAPING_ZETA_Y = 0x232D;
 constexpr uint16_t VP_INPUT_SHAPING_BACK_BUTTON = 0x232F;
 constexpr uint16_t VP_INPUT_SHAPING_NAV_BUTTON = 0x2331;
+constexpr uint16_t VP_INPUT_SHAPING_APPLY_BUTTON = 0x2333;
 
 // FWRetract
 constexpr uint16_t VP_FWRETRACT_NAV_BUTTON = 0x22AD;
