@@ -1767,11 +1767,13 @@
 #define Y_BED_SIZE 230
 
 // Travel limits (linear=mm, rotational=°) after homing, corresponding to endstop positions.
-#define X_MIN_POS -11.0
-#define Y_MIN_POS -26.4
+#define X_MIN_POS -11.0 // distance between the left edge of the printing bed and X_MIN_STOP
+#define Y_MIN_POS -26.4 // distance between the front edge of the printing bed and Y_MIN_STOP
 #define Z_MIN_POS 0
-#define X_MAX_POS (X_BED_SIZE - X_MIN_POS + 0.1)
-#define Y_MAX_POS (Y_BED_SIZE - Y_MIN_POS + 0.1)
+#define X_MAX_OFFSET 10.0 // distance between the right edge of the printing bed and X_MAX_STOP
+#define Y_MAX_OFFSET 25.0 // distance between the back edge of the printing bed and Y_MAX_STOP
+#define X_MAX_POS (X_BED_SIZE + X_MAX_OFFSET ) // maximum movement bounds (X_MIN_POS to X_MAX_POS)
+#define Y_MAX_POS (Y_BED_SIZE + Y_MAX_OFFSET ) // maximum movement bounds (Y_MIN_POS to Y_MAX_POS)
 #define Z_MAX_POS 260
 //#define I_MIN_POS 0
 //#define I_MAX_POS 50
@@ -2142,8 +2144,8 @@
 
 // Manually set the home position. Leave these undefined for automatic settings.
 // For DELTA this is the top-center of the Cartesian print volume.
-#define MANUAL_X_HOME_POS -1.0
-#define MANUAL_Y_HOME_POS -6.4
+#define MANUAL_X_HOME_POS -11.0
+#define MANUAL_Y_HOME_POS -21.4
 //#define MANUAL_Z_HOME_POS 0    //was 1.4
 //#define MANUAL_I_HOME_POS 0
 //#define MANUAL_J_HOME_POS 0
