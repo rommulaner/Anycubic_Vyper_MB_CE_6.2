@@ -71,7 +71,9 @@
 
 #define GRID_MAX_POINTS_X 4   // moved here for easier change of the bed leveling mesh size
 
-//#define ALL_METAL_HOTEND      // if all metal hotend installed hotend max temp is raisded from 260 to 300
+//#define ALL_METAL_HOTEND      // activate if all metal hotend installed; hotend max temp will be raisded from 260 to 300
+
+#define SLOWDOWN_FAN_ON_TEMPDROP    // activates ADAPTIVE_FAN_SLOWING in configuration_adv.h
 
 // Leave undefined to home Z using two Z sensors (stock configuration)
 //#define VYPER_NOZZLE_HOMING // home Z using nozzle sensor at middle of bed
