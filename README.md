@@ -1,5 +1,6 @@
 # Community firmware for Anycubic Vyper
 
+*This repository contains only firmware for the main board, for LCD firmware look [here.](https://github.com/rommulaner/Anycubic_Vyper_LCD_CE_6.2)
 ## Downloads
 
 At present there are no binary downloads since the STM license conditions for some of the libraries used restrict execution to STM devices only, the Vyper mainboard uses a non-STM device. 
@@ -55,6 +56,9 @@ There are also two options for homing of the Z axis;
 	
 There are advantages and disadvantages to using the nozzle as Z home position, the mesh values will be closer to 0 and thus will show less red or blue but homing will not complete without a working sensor. Also the Z 'flags' used to trigger the Z axis sensors need to be lower than the nozzle, this is the case with fixed flags but the adjustable ones MUST be set to protrude as far below as possible else the nozzle will impact the bed.
 
+### LCD Touch Screen Flashing
+When flashing the mainboard firmware, also flash the LCD screen to the corresponding version. 
+For the Anycubic Vyper the firmware can be found in [its own repository.](https://github.com/rommulaner/Anycubic_Vyper_LCD_CE_6.2)
 
 ## Purpose of this community firmware
 
