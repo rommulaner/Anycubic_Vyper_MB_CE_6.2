@@ -60,14 +60,20 @@
 // @section info
 
 // select build type here
-//#define VYPER_BUILD         // standard
-//#define VYPER_BUILD_IS      // standard but with input shaping
-//#define VYPER_BUILD_LA      // with linear advance and junction deviation enabled
-//#define VYPER_BUILD_LA_T    // as above but with uart connection to TMC2209's for x, y, z and z2
-//#define VYPER_BUILD_LA_TE   // as above but with software serial connection to e stepper
-#define VYPER_BUILD_LA_IS   // with linear advance and junction deviation enabled and input shaping
-//#define VYPER_BUILD_LA_T_IS    // as above but with uart connection to TMC2209's for x, y, z and z2
-//#define VYPER_BUILD_LA_TE_IS   // as above but with software serial connection to e stepper
+//#define VYPER_BUILD_CJ          // standard and classic jerk enabled
+//#define VYPER_BUILD_CJ_IS       // standard and classic jerk enabled but with input shaping
+//#define VYPER_BUILD_LA_JD       // with linear advance and junction deviation enabled
+//#define VYPER_BUILD_LA_CJ       // with linear advance and classic jerk enabled
+//#define VYPER_BUILD_LA_JD_T     // with linear advance and junction deviation enabled and with uart connection to TMC2209's for x, y, z and z2
+//#define VYPER_BUILD_LA_CJ_T     // with linear advance and classic jerk enabled and with uart connection to TMC2209's for x, y, z and z2
+//#define VYPER_BUILD_LA_JD_TE    // with linear advance and junction deviation enabled and with software serial connection to e stepper
+//#define VYPER_BUILD_LA_CJ_TE    // with linear advance and classic jerk enabled and with software serial connection to e stepper
+//#define VYPER_BUILD_LA_JD_IS      // with linear advance and junction deviation enabled and input shaping
+#define VYPER_BUILD_LA_CJ_IS    // with linear advance and classic jerk enabled and input shaping
+//#define VYPER_BUILD_LA_JD_IS_T  // with linear advance and junction deviation enabled and input shaping and with uart connection to TMC2209's for x, y, z and z2
+//#define VYPER_BUILD_LA_CJ_IS_T  // with linear advance and classic jerk enabled and input shaping and with uart connection to TMC2209's for x, y, z and z2
+//#define VYPER_BUILD_LA_JD_IS_TE // with linear advance and junction deviation enabled and input shaping and with software serial connection to e stepper
+//#define VYPER_BUILD_LA_CJ_IS_TE // with linear advance and classic jerk enabled and input shaping and with software serial connection to e stepper
 
 #define GRID_MAX_POINTS_X 4   // moved here for easier change of the bed leveling mesh size
 
@@ -185,18 +191,18 @@
  *          TMC5130, TMC5130_STANDALONE, TMC5160, TMC5160_STANDALONE
  * :['A4988', 'A5984', 'DRV8825', 'LV8729', 'TB6560', 'TB6600', 'TMC2100', 'TMC2130', 'TMC2130_STANDALONE', 'TMC2160', 'TMC2160_STANDALONE', 'TMC2208', 'TMC2208_STANDALONE', 'TMC2209', 'TMC2209_STANDALONE', 'TMC26X', 'TMC26X_STANDALONE', 'TMC2660', 'TMC2660_STANDALONE', 'TMC5130', 'TMC5130_STANDALONE', 'TMC5160', 'TMC5160_STANDALONE']
  */
-#if ANY(VYPER_BUILD, VYPER_BUILD_IS, VYPER_BUILD_LA, VYPER_BUILD_LA_IS)
+#if ANY(VYPER_BUILD_CJ, VYPER_BUILD_CJ_IS, VYPER_BUILD_LA_JD, VYPER_BUILD_LA_CJ, VYPER_BUILD_LA_JD_IS, VYPER_BUILD_LA_CJ_IS)
   #define X_DRIVER_TYPE  TMC2209_STANDALONE
   #define Y_DRIVER_TYPE  TMC2209_STANDALONE
   #define Z_DRIVER_TYPE  TMC2209_STANDALONE
   #define Z2_DRIVER_TYPE TMC2209_STANDALONE
   #define E0_DRIVER_TYPE TMC2209_STANDALONE
-#elif ANY(VYPER_BUILD_LA_T, VYPER_BUILD_LA_T_IS, VYPER_BUILD_LA_TE, VYPER_BUILD_LA_TE_IS)
+#elif ANY(VYPER_BUILD_LA_JD_T, VYPER_BUILD_LA_CJ_T, VYPER_BUILD_LA_JD_IS_T, VYPER_BUILD_LA_CJ_IS_T, VYPER_BUILD_LA_JD_TE, VYPER_BUILD_LA_CJ_TE, VYPER_BUILD_LA_JD_IS_TE, VYPER_BUILD_LA_CJ_IS_TE)
   #define X_DRIVER_TYPE  TMC2209
   #define Y_DRIVER_TYPE  TMC2209
   #define Z_DRIVER_TYPE  TMC2209
   #define Z2_DRIVER_TYPE TMC2209
-  #if ANY(VYPER_BUILD_LA_TE, VYPER_BUILD_LA_TE_IS)
+  #if ANY(VYPER_BUILD_LA_JD_TE, VYPER_BUILD_LA_CJ_TE, VYPER_BUILD_LA_JD_IS_TE, VYPER_BUILD_LA_CJ_IS_TE)
     #define E0_DRIVER_TYPE TMC2209
   #else
     #define E0_DRIVER_TYPE TMC2209_STANDALONE
@@ -1272,14 +1278,15 @@
  * When changing speed and direction, if the difference is less than the
  * value set here, it may happen instantaneously.
  */
-#if ANY(VYPER_BUILD, VYPER_BUILD_IS)
+#if ANY(VYPER_BUILD_CJ, VYPER_BUILD_CJ_IS, VYPER_BUILD_LA_CJ, VYPER_BUILD_LA_CJ_T, VYPER_BUILD_LA_CJ_TE, VYPER_BUILD_LA_CJ_IS, VYPER_BUILD_LA_CJ_IS_T, VYPER_BUILD_LA_CJ_IS_TE)
   #define CLASSIC_JERK
 #endif
 
 #if ENABLED(CLASSIC_JERK)
-  #define DEFAULT_XJERK  7.0
-  #define DEFAULT_YJERK  7.0
-  #define DEFAULT_ZJERK  0.3
+  #define DEFAULT_XJERK   7.0
+  #define DEFAULT_YJERK   7.0
+  #define DEFAULT_ZJERK   0.3
+  #define DEFAULT_EJERK  14.0
   //#define DEFAULT_IJERK  0.3
   //#define DEFAULT_JJERK  0.3
   //#define DEFAULT_KJERK  0.3
@@ -1295,8 +1302,6 @@
   #endif
 #endif
 
-#define DEFAULT_EJERK    7.0  // May be used by Linear Advance
-
 /**
  * Junction Deviation Factor
  *
@@ -1305,6 +1310,7 @@
  *   https://blog.kyneticcnc.com/2018/10/computing-junction-deviation-for-marlin.html
  */
 #if DISABLED(CLASSIC_JERK)
+  #define DEFAULT_EJERK    7.0
   #define JUNCTION_DEVIATION_MM 0.007 // (mm) Distance from real junction edge (=nozzle_diameter*Jerk^2/print_acceleration)
   #define JD_HANDLE_SMALL_SEGMENTS    // Use curvature estimation instead of just the junction angle
                                       // for small segments (< 1mm) with large junction angles (> 135°).
@@ -1318,7 +1324,7 @@
  *
  * See https://github.com/synthetos/TinyG/wiki/Jerk-Controlled-Motion-Explained
  */
-#if ANY(VYPER_BUILD, VYPER_BUILD_IS)
+#if ANY(VYPER_BUILD_CJ, VYPER_BUILD_CJ_IS)
   #define S_CURVE_ACCELERATION
 #endif
 
@@ -2214,16 +2220,16 @@
  *    +-------------->X     +-------------->X     +-------------->Y
  *     XY_SKEW_FACTOR        XZ_SKEW_FACTOR        YZ_SKEW_FACTOR
  */
-//#define SKEW_CORRECTION
+#define SKEW_CORRECTION
 
 #if ENABLED(SKEW_CORRECTION)
   // Input all length measurements here:
-  #define XY_DIAG_AC 282.8427124746
-  #define XY_DIAG_BD 282.8427124746
-  #define XY_SIDE_AD 200
+  //#define XY_DIAG_AC 282.8427124746
+  //#define XY_DIAG_BD 282.8427124746
+  //#define XY_SIDE_AD 200
 
   // Or, set the XY skew factor directly:
-  //#define XY_SKEW_FACTOR 0.0
+  #define XY_SKEW_FACTOR 0.0
 
   //#define SKEW_CORRECTION_FOR_Z
   #if ENABLED(SKEW_CORRECTION_FOR_Z)
@@ -2239,7 +2245,7 @@
   #endif
 
   // Enable this option for M852 to set skew at runtime
-  //#define SKEW_CORRECTION_GCODE
+  #define SKEW_CORRECTION_GCODE
 #endif
 
 //=============================================================================

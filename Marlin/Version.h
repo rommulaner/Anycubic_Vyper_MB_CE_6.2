@@ -32,42 +32,66 @@
  */
 
 #ifdef VYPER_NOZZLE_HOMING
-    #ifdef VYPER_BUILD
+    #ifdef VYPER_BUILD_CJ
         #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(CJ+N)"
-    #elif defined VYPER_BUILD_IS
+    #elif defined VYPER_BUILD_CJ_IS
         #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(CJ+IS+N)"
-    #elif defined VYPER_BUILD_LA
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+N)"
-    #elif defined VYPER_BUILD_LA_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+IS+N)"
-    #elif defined VYPER_BUILD_LA_T
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+T+N)"
-    #elif defined VYPER_BUILD_LA_T_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+T+IS+N)"
-    #elif defined VYPER_BUILD_LA_TE
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+TE+N)"
-    #elif defined VYPER_BUILD_LA_TE_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+TE+IS+N)"
+    #elif defined VYPER_BUILD_LA_JD
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+N)"
+    #elif defined VYPER_BUILD_LA_CJ
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+N)"
+    #elif defined VYPER_BUILD_LA_JD_IS
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+IS+N)"
+    #elif defined VYPER_BUILD_LA_CJ_IS
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+IS+N)"
+    #elif defined VYPER_BUILD_LA_JD_T
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+T+N)"
+    #elif defined VYPER_BUILD_LA_CJ_T
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+T+N)"
+    #elif defined VYPER_BUILD_LA_JD_IS_T
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+IS+T+N)"
+    #elif defined VYPER_BUILD_LA_CJ_IS_T
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+IS+T+N)"
+    #elif defined VYPER_BUILD_LA_JD_TE
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+TE+N)"
+    #elif defined VYPER_BUILD_LA_CJ_TE
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+TE+N)"
+    #elif defined VYPER_BUILD_LA_JD_IS_TE
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+IS+TE+N)"
+    #elif defined VYPER_BUILD_LA_CJ_IS_TE
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+IS+TE+N)"
     #else
         #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2"
     #endif
 #else
-    #ifdef VYPER_BUILD
+    #ifdef VYPER_BUILD_CJ
         #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(CJ)"
-    #elif defined VYPER_BUILD_IS
+    #elif defined VYPER_BUILD_CJ_IS
         #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(CJ+IS)"
-    #elif defined VYPER_BUILD_LA
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA)"
-    #elif defined VYPER_BUILD_LA_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+IS)"
-    #elif defined VYPER_BUILD_LA_T
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+T)"
-    #elif defined VYPER_BUILD_LA_T_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+T+IS)"
-    #elif defined VYPER_BUILD_LA_TE
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+TE)"
-    #elif defined VYPER_BUILD_LA_TE_IS
-        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+TE+IS)"
+    #elif defined VYPER_BUILD_LA_JD
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD)"
+    #elif defined VYPER_BUILD_LA_CJ
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ)"
+    #elif defined VYPER_BUILD_LA_JD_IS
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+IS)"
+    #elif defined VYPER_BUILD_LA_CJ_IS
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+IS)"
+    #elif defined VYPER_BUILD_LA_JD_T
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+T)"
+    #elif defined VYPER_BUILD_LA_CJ_T
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+T)"
+    #elif defined VYPER_BUILD_LA_JD_IS_T
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+IS+T)"
+    #elif defined VYPER_BUILD_LA_CJ_IS_T
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+IS+T)"
+    #elif defined VYPER_BUILD_LA_JD_TE
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+TE)"
+    #elif defined VYPER_BUILD_LA_CJ_TE
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+TE)"
+    #elif defined VYPER_BUILD_LA_JD_IS_TE
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+JD+IS+TE)"
+    #elif defined VYPER_BUILD_LA_CJ_IS_TE
+        #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2(LA+CJ+IS+TE)"
     #else
         #define SHORT_BUILD_VERSION "Vyper-CE-6.2.2"
     #endif
@@ -84,7 +108,7 @@
  * here we define this default string as the date where the latest release
  * version was tagged.
  */
-#define STRING_DISTRIBUTION_DATE "2024-01-21"
+#define STRING_DISTRIBUTION_DATE "2024-12-25"
 
 /**
  * Defines a generic printer name to be output to the LCD after booting Marlin.

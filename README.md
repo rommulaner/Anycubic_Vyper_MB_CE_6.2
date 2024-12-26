@@ -24,14 +24,20 @@ There are several configurations for the build of the source and they can be fou
 // %%%% Options for building Vyper image %%%%
 
 // select build type here
-//#define VYPER_BUILD         // standard
-//#define VYPER_BUILD_IS      // standard but with input shaping
-//#define VYPER_BUILD_LA      // with linear advance and junction deviation enabled
-//#define VYPER_BUILD_LA_T    // as above but with uart connection to TMC2209's for x, y, z and z2
-//#define VYPER_BUILD_LA_TE   // as above but with software serial connection to e stepper
-#define VYPER_BUILD_LA_IS   // with linear advance and junction deviation enabled and input shaping
-//#define VYPER_BUILD_LA_T_IS    // as above but with uart connection to TMC2209's for x, y, z and z2
-//#define VYPER_BUILD_LA_TE_IS   // as above but with software serial connection to e stepper
+//#define VYPER_BUILD_CJ          // standard and classic jerk enabled
+//#define VYPER_BUILD_CJ_IS       // standard and classic jerk enabled but with input shaping
+//#define VYPER_BUILD_LA_JD       // with linear advance and junction deviation enabled
+//#define VYPER_BUILD_LA_CJ       // with linear advance and classic jerk enabled
+//#define VYPER_BUILD_LA_JD_T     // with linear advance and junction deviation enabled and with uart connection to TMC2209's for x, y, z and z2
+//#define VYPER_BUILD_LA_CJ_T     // with linear advance and classic jerk enabled and with uart connection to TMC2209's for x, y, z and z2
+//#define VYPER_BUILD_LA_JD_TE    // with linear advance and junction deviation enabled and with software serial connection to e stepper
+//#define VYPER_BUILD_LA_CJ_TE    // with linear advance and classic jerk enabled and with software serial connection to e stepper
+//#define VYPER_BUILD_LA_JD_IS      // with linear advance and junction deviation enabled and input shaping
+//#define VYPER_BUILD_LA_CJ_IS    // with linear advance and classic jerk enabled and input shaping
+//#define VYPER_BUILD_LA_JD_IS_T  // with linear advance and junction deviation enabled and input shaping and with uart connection to TMC2209's for x, y, z and z2
+//#define VYPER_BUILD_LA_CJ_IS_T  // with linear advance and classic jerk enabled and input shaping and with uart connection to TMC2209's for x, y, z and z2
+//#define VYPER_BUILD_LA_JD_IS_TE // with linear advance and junction deviation enabled and input shaping and with software serial connection to e stepper
+//#define VYPER_BUILD_LA_CJ_IS_TE // with linear advance and classic jerk enabled and input shaping and with software serial connection to e stepper
 
 // Leave undefined to home Z using two Z sensors (stock configuration)
 //#define VYPER_NOZZLE_HOMING // home Z using nozzle sensor at middle of bed
